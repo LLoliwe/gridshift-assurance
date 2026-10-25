@@ -1,0 +1,16 @@
+import assert from 'node:assert/strict';
+import {WorkspaceState,copy,diff,evidenceGuide} from '../web/workspace/workspace-state.js';
+const base={schema_version:'gridshift.workspace.case.v1',original:{parsed:{records:[{record_id:'A',quantity:'100'}],resolutions:[]}},working:{records:[{record_id:'A',quantity:'100'}],resolutions:[]},revision:0,history:[],cached_review:null};
+const state=new WorkspaceState();state.case=copy(base);
+const old=state.begin('review');state.beginDraft();assert.equal(state.pending,null);state.draft.records[0].quantity='80';assert.equal(state.receive(old,{case:base,result:{decision:'ACCEPT'}}),false);
+state.saveDraft('Explicit development source reference');assert.equal(state.case.original.parsed.records[0].quantity,'100');assert.equal(state.case.working.records[0].quantity,'80');assert.equal(state.case.revision,1);assert.equal(state.case.history[0].changes[0].path,'/records/0/quantity');
+let token=state.begin('review');assert.equal(state.receive(token,{case:state.case,result:{decision:'CORRECT',proposal_sha256:'a'.repeat(64)}}),true);
+state.reviewerChanged('Reviewer');assert.equal(state.result,null);assert.equal(state.canAccept(),false);
+token=state.begin('review');state.receive(token,{case:state.case,result:{decision:'CORRECT',proposal_sha256:'a'.repeat(64)}});state.confirmed=true;assert.equal(state.canAccept(),true);
+state.case.working.resolutions=[{reviewer_id:'Reviewer',proposal_sha256:'a'.repeat(64)}];state.reviewerChanged('Other');assert.deepEqual(state.case.working.resolutions,[]);assert.equal(state.case.history.at(-1).kind,'invalidated_resolution');assert.equal(state.canAccept(),false);
+state.beginDraft();state.draft.records[0].quantity='9';state.cancelDraft();assert.equal(state.case.working.records[0].quantity,'80');assert.equal(state.result,null);
+assert.equal(state.receive(null,{}),false);assert.throws(()=>state.saveDraft('x'));
+assert.equal(evidenceGuide({decision:'ACCEPT',resolution_accepted:false}).title,'Consistent with this calculation policy');
+assert.equal(evidenceGuide({decision:'WITHHOLD',findings:[{message:'Missing specific link',record_ids:['A']}]}).why,'Missing specific link');
+assert.deepEqual(diff({quantity:'1.000'},{quantity:'1'}),[{path:'/quantity',before:'1.000',after:'1'}]);
+console.log('Workspace state: stale-response exclusion, revisions, original preservation, reviewer invalidation, cancellation and typed guide passed.');

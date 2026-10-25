@@ -1,0 +1,41 @@
+name: Experimental workspace browser validation (not a release)
+on:
+  push:
+    branches: ['experiment/workspace-browser-r2']
+permissions:
+  contents: read
+concurrency:
+  group: experimental-workspace-browser-r2
+  cancel-in-progress: true
+jobs:
+  browser:
+    if: github.repository == 'LLoliwe/gridshift-assurance' && github.event.repository.private == false
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # official v6, verified 2026-10-25
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # official v6, verified 2026-10-25
+        with:
+          node-version: '24'
+          package-manager-cache: false
+      - name: Install locked test dependencies (no scripts, audit or cache action)
+        working-directory: browser-tests
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Install supported Chromium and system dependencies
+        working-directory: browser-tests
+        run: ./node_modules/.bin/playwright install --with-deps chromium
+      - name: Identify exact public candidate
+        run: |
+          printf 'Experimental only. Not a production release or owner visual acceptance.\n'
+          git rev-parse HEAD
+          node --version
+          python3 --version
+          sha256sum web/workspace/* browser-tests/package-lock.json
+      - name: Real sandboxed Chromium and Pyodide functional validation
+        working-directory: browser-tests
+        run: ./node_modules/.bin/playwright test --config=playwright.config.mjs
+      # Intentionally no cache, artifact upload, deployment, PR write or credentials.
+      # Images/downloads are ephemeral on the runner. Synthetic results are logs only.

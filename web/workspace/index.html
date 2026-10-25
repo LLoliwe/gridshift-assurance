@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light"><title>Review a report · GRIDSHIFT</title>
+<link rel="stylesheet" href="./workspace.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to review workspace</a>
+<header class="topbar"><a class="brand" href="../">GRIDSHIFT<span>Evidence workspace</span></a><div class="topbar-actions"><span id="runtime" class="status-chip" role="status">Preparing Python runtime</span><button id="retry" class="quiet" type="button" hidden>Retry runtime</button><a href="../reconcile/">Original examples</a></div></header>
+<div class="scope-strip">South Africa · 2024 · Purchased electricity <span>Conditional inventory calculation, not independent assurance</span></div>
+<main id="main" class="workspace-shell">
+<section class="intro"><div><p class="eyebrow">THE REVIEWER’S DECISION</p><h1>Can I use this report?</h1><p>Check what supports the total. Keep the original intact. Hand over a decision the next reviewer can inspect.</p></div><span class="private-label">Private working candidate</span></section>
+<section class="toolbar" aria-label="Open a case">
+<div class="open-control"><label class="primary file-label" for="case-file">Open a case<input id="case-file" type="file" accept=".json,application/json"></label><button id="new-case" type="button" class="secondary">Enter a report</button></div>
+<div class="example-control"><label for="example">Or explore an invented example</label><select id="example"><option value="missing-edge">Replacement link missing</option><option value="flagship">Explicit replacement</option></select><button id="load-example" type="button" class="quiet">Open example</button></div>
+<p class="toolbar-help">JSON case files: raw package ≤64 KiB; workspace handoff ≤768 KiB. Files stay in this tab. No automatic upload or storage.</p>
+</section>
+<p id="notice" class="notice" role="status" aria-live="polite">Open a declared case, or enter the original report and evidence using guided fields.</p>
+<div id="empty" class="empty-state"><span class="step-number">01</span><h2>Start with the report, not the answer.</h2><p>A case contains an original report, source-record declarations and explicit coverage. GRIDSHIFT checks that declared package using the existing Python policy. It cannot authenticate the underlying documents.</p><p>No source facts, replacement links or coverage are guessed.</p></div>
+<div id="case-workspace" hidden>
+<div class="case-heading"><div><p class="eyebrow" id="case-kind">DECLARED CASE</p><h2 id="case-title"></h2></div><span id="revision-label" class="status-chip">Original</span></div>
+<div class="workspace-grid">
+<section class="evidence-pane" aria-labelledby="original-title">
+<div class="section-heading"><div><p class="eyebrow">01 / PRESERVED EVIDENCE</p><h2 id="original-title">Inspect the original</h2></div><button id="download-original" type="button" class="quiet">Original bytes ↓</button></div>
+<div class="metric-pair"><div class="metric"><span>Original reported energy</span><strong id="original-energy">—</strong></div><div class="metric"><span>Original reported emissions</span><strong id="original-emissions">—</strong></div></div>
+<p class="source-caption"><strong>Published factor: 0.960 tCO₂e/MWh. Source reconciliation remains unresolved.</strong></p>
+<p class="source-caption">These are declared source records, not authenticated source documents. The original report and bytes never change.</p>
+<div class="section-heading compact"><h3>Working record set</h3><button id="revise" type="button" class="secondary">Record a revision</button></div>
+<p id="working-report" class="working-report"></p>
+<div class="ledger-scroll"><table class="ledger"><caption class="sr-only">Working source records. Select a record to inspect all declarations.</caption><thead><tr><th scope="col">Record</th><th scope="col">Original quantity</th><th scope="col">Working quantity</th><th scope="col">Declared relationship</th><th scope="col">Policy use</th></tr></thead><tbody id="records"></tbody></table></div>
+<section id="record-detail" class="record-detail" aria-labelledby="record-title" tabindex="-1"><h3 id="record-title">Choose a record</h3><dl id="record-fields"></dl><details class="advanced"><summary>Compare preserved original record</summary><pre id="record-original"></pre></details></section>
+<details id="coverage-section"><summary>Declared coverage — never inferred</summary><div id="coverage"></div><p>Periods are end-exclusive. Surviving records must exactly cover the declared sites, meters and periods. A void does not prove zero use.</p></details>
+<details class="advanced"><summary>Original package, exact hash and technical details</summary><p>Raw-byte SHA-256 <code id="original-hash"></code></p><p>Unsigned content fingerprint only, not a signature or identity check.</p><pre id="original-json"></pre></details>
+</section>
+<section class="decision-pane" aria-labelledby="decision-title">
+<div class="section-heading"><div><p class="eyebrow">02 / CURRENT FINDING</p><h2 id="decision-title" tabindex="-1">Not reviewed</h2></div><span id="decision-status" class="status-chip">Rerun required</span></div>
+<p id="decision-label">Run the actual Python review. Imported results and acceptance never count as a current decision.</p>
+<div class="button-row"><button id="run" type="button" class="primary" disabled>Review this package</button><button id="save-draft" type="button" class="quiet" disabled>Save unreviewed draft</button></div>
+<div class="field reviewer-field"><label for="reviewer">Your reviewer identifier <span>(self-reported, not authenticated)</span></label><input id="reviewer" type="text" maxlength="2000" autocomplete="off" placeholder="Name or review reference"></div>
+<div id="result"></div>
+<section id="acceptance" class="acceptance" hidden aria-labelledby="accept-title"><h3 id="accept-title">Confirm this exact correction</h3><p id="proposal-description"></p><p class="hash-label">Exact proposal <code id="proposal-hash"></code></p><label class="check-label"><input id="confirm" type="checkbox">I have checked the declared evidence and intentionally accept this exact proposal.</label><button id="accept" class="primary" type="button" disabled>Accept correction and rerun</button></section>
+<section class="handoff"><h3>03 / Hand over the evidence</h3><p>The readable summary and portable case preserve the original, revisions, findings and history. The next reviewer must reopen and recompute.</p><div class="button-row"><button id="export-case" type="button" class="secondary" disabled>Download reviewed case</button><button id="export-summary" type="button" class="quiet" disabled>Download readable summary</button></div></section>
+<details class="guide" id="guide"><summary>Evidence Guide <span>Read-only guided help</span></summary><h3 id="guide-title"></h3><h4>Why is this flagged?</h4><p id="guide-why"></p><h4>What can I do next?</h4><p id="guide-next"></p><div id="guide-links"></div><p class="source-caption">Deterministic explanations from the current engine finding. Not a generative assistant; cannot edit or approve.</p></details>
+</section>
+</div>
+<section id="revision-editor" class="revision-editor" hidden aria-labelledby="revision-title">
+<div class="section-heading"><div><p class="eyebrow">WORKING REVISION / ORIGINAL UNCHANGED</p><h2 id="revision-title" tabindex="-1">Record what the evidence supports</h2></div><button id="cancel-revision" type="button" class="quiet">Cancel draft</button></div>
+<p>Only change declarations when supported by your source. Do not remove inconvenient records, guess a replacement link or narrow coverage just to get an accepted result. Current approval is cleared as soon as editing starts.</p>
+<form id="revision-form">
+<div id="package-fields" class="field-grid"></div>
+<h3>Reported totals and declarations</h3><div id="report-fields" class="field-grid"></div>
+<h3>Source records</h3><div id="record-editors"></div><button id="add-record" type="button" class="secondary">Add a source record</button>
+<h3>Explicit coverage</h3><p>Supply each intended entity, site, meter, country and end-exclusive period. Coverage is never copied from records automatically.</p><div id="coverage-editors"></div><button id="add-coverage" type="button" class="secondary">Add a coverage declaration</button>
+<details class="advanced"><summary>Advanced: exact package JSON</summary><p>Expert inspection only. Source facts are edited with the guided controls above. Unsupported original fields are preserved, not silently removed.</p><pre id="working-json"></pre></details>
+<h3>Before / after</h3><div id="draft-diff" class="diff-list"></div>
+<div class="field"><label for="revision-reason">Why is this revision supported? Include the source reference.</label><textarea id="revision-reason" required maxlength="2000" rows="3" placeholder="For example: document B explicitly says it fully replaces record A for the same meter and period."></textarea></div>
+<div class="button-row"><button id="save-revision" type="submit" class="primary">Save revision · rerun required</button><button id="restore-original" type="button" class="quiet">Use original declarations in this draft</button></div>
+</form></section>
+<details class="history"><summary>Decision and revision history <span id="history-count"></span></summary><p>Imported entries are unverified historical self-reports, never a current approval.</p><div id="history-list"></div></details>
+</div>
+<footer class="workspace-footer"><strong>Supported calculation, bounded claims.</strong><p>Published 0.960 tCO₂e/MWh input. Source reconciliation remains unresolved. Not measured savings, carbon credits, full Scope 2 compliance or independent verification. Activity remains synthetic or unverified as declared.</p><details><summary>Runtime, privacy and supported limits</summary><p>The pinned Pyodide 314.0.7 runtime downloads from jsDelivr; first load requires network access. Case data are processed in a local browser worker, not deliberately sent to a server. No browser storage or analytics is used. Keep downloaded files secure. Runtime files are separately licensed under MPL 2.0 and upstream third-party notices.</p><p>The core allows up to 1,000 records and coverage entries, but this workspace has a conservative 64 KiB original/working-package limit, 768 KiB complete envelope limit, 100 history entries and 2 MiB worker-request limit including escaping/metadata. Whichever limit is reached first applies. Larger cases require a different reviewed workflow; do not discard material evidence to fit.</p></details></footer>
+</main><script type="module" src="./workspace.js"></script>
+</body></html>
