@@ -1,0 +1,55 @@
+{
+  "schema_version": "gridshift.limited_attributed_fact_extract.v1",
+  "publisher": "Exxaro",
+  "source_workbook_url": "https://exxaro-prod.azureedge.net/sitestorage/media/mnbcqsd2/exx_2024-databook_v3_20250527.xlsx",
+  "source_workbook_sha256": "82838927a13986c4fcb3b013e5463b663b00feae22f440db5d361034e6e0e816",
+  "sheet": "Environmental data",
+  "unit": "MWh",
+  "unit_cell": "G126",
+  "year_header_cells": [
+    "G127",
+    "I127"
+  ],
+  "curation": "Manually curated known case, found by manual AI-assisted source research before replay implementation. Not automatic discovery.",
+  "rows": [
+    {
+      "site_cell": "F137",
+      "site_source_text": "Durnacol¹",
+      "year": 2024,
+      "prior_year": 2023,
+      "current_cell": "G137",
+      "percentage_cell": "H137",
+      "prior_cell": "I137",
+      "current_present": true,
+      "prior_present": true,
+      "percentage_present": true,
+      "current_source": {
+        "xml_type": "n",
+        "raw_v_token": "155.69",
+        "source_text_or_numeric_token": "155.69",
+        "formula": null,
+        "has_cached_value": true,
+        "number_format": "#,##0",
+        "style_index": "529"
+      },
+      "prior_source": {
+        "xml_type": "n",
+        "raw_v_token": "146",
+        "source_text_or_numeric_token": "146",
+        "formula": null,
+        "has_cached_value": true,
+        "number_format": "#,##0",
+        "style_index": "542"
+      },
+      "percentage_source": {
+        "xml_type": "s",
+        "raw_v_token": "1617",
+        "source_text_or_numeric_token": "▼-6.85",
+        "formula": null,
+        "has_cached_value": true,
+        "number_format": "0.00%",
+        "style_index": "787"
+      }
+    }
+  ]
+}

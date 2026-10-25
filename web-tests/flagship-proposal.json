@@ -1,0 +1,129 @@
+{
+  "schema_version": "gridshift.reconciliation.result.v1",
+  "policy": "gridshift.reconciliation.policy.v1",
+  "decision": "CORRECT",
+  "decision_label": "Correction proposed; reviewer acceptance required",
+  "source_package_sha256": "bf611cd3223eeafaa2da24209bfbe2dc57b78e765b851f14d3d5478b774a77c0",
+  "included_record_ids": [
+    "B",
+    "C"
+  ],
+  "excluded_record_ids": [
+    "A"
+  ],
+  "proposed_report": {
+    "claim_type": "CONDITIONAL_INVENTORY_ESTIMATE",
+    "energy_mwh": "100",
+    "emissions_tco2e": "96",
+    "factor_id": "ZA_NGGEF_2024_DFFE_2026",
+    "data_year": 2024,
+    "boundary": "SCOPE2_LOCATION_BASED_PURCHASED_ELECTRICITY",
+    "activity_statuses": [
+      "SYNTHETIC"
+    ],
+    "limitations": [
+      "NOT_AN_INDEPENDENT_VERIFICATION",
+      "NOT_BLOCKCHAIN",
+      "NOT_MEASURED_SAVINGS",
+      "EXCLUDES_SCOPE3_T_AND_D",
+      "ANNUAL_AVERAGE_NOT_TIME_OF_USE",
+      "ACTIVITY_NOT_VERIFIED",
+      "PUBLISHED_FACTOR_INPUT_RECONCILIATION_UNRESOLVED",
+      "MARKET_BASED_NOT_COMPUTED",
+      "ORGANIZATIONAL_BOUNDARY_NOT_REVIEWED",
+      "NOT_FULL_SCOPE2_COMPLIANCE"
+    ]
+  },
+  "accepted_report": null,
+  "proposal_sha256": "68f7289fedc419434ac4adf01b6d637053ab4bb69888876ee632a1880ba2f415",
+  "resolution_accepted": false,
+  "trace": [
+    {
+      "record_id": "A",
+      "source_id": "document-A",
+      "action": "ORIGINAL",
+      "target_record_id": null,
+      "included": false,
+      "reason": "EXPLICITLY_SUPERSEDED_OR_VOIDED",
+      "source_status": "SYNTHETIC"
+    },
+    {
+      "record_id": "B",
+      "source_id": "document-B",
+      "action": "FULL_REPLACEMENT",
+      "target_record_id": "A",
+      "included": true,
+      "reason": "ACTIVE_SUPPORTED_RECORD",
+      "source_status": "SYNTHETIC"
+    },
+    {
+      "record_id": "C",
+      "source_id": "document-C",
+      "action": "ORIGINAL",
+      "target_record_id": null,
+      "included": true,
+      "reason": "ACTIVE_SUPPORTED_RECORD",
+      "source_status": "SYNTHETIC"
+    }
+  ],
+  "discrepancy": {
+    "energy_mwh": "100",
+    "emissions_tco2e": "96",
+    "absolute_emissions_tco2e": "96",
+    "relative_emissions_fraction": "1",
+    "materiality_threshold_tco2e": "1",
+    "material": true,
+    "policy": "PROTOTYPE_TRIAGE_NOT_AUDIT_STANDARD"
+  },
+  "findings": [
+    {
+      "code": "SUPPORTED_LINEAGE_CORRECTION",
+      "message": "Explicit supported lineage changes the accepted record set; original evidence retained.",
+      "record_ids": [
+        "A"
+      ]
+    },
+    {
+      "code": "REPORT_TOTAL_MISMATCH",
+      "message": "Reported energy or emissions differ from the uniquely supported record set.",
+      "record_ids": [
+        "B",
+        "C"
+      ]
+    }
+  ],
+  "required_evidence": [],
+  "limitations": [
+    "NOT_AN_INDEPENDENT_VERIFICATION",
+    "NOT_BLOCKCHAIN",
+    "NOT_MEASURED_SAVINGS",
+    "EXCLUDES_SCOPE3_T_AND_D",
+    "ANNUAL_AVERAGE_NOT_TIME_OF_USE",
+    "ACTIVITY_NOT_VERIFIED",
+    "PUBLISHED_FACTOR_INPUT_RECONCILIATION_UNRESOLVED",
+    "MARKET_BASED_NOT_COMPUTED",
+    "ORGANIZATIONAL_BOUNDARY_NOT_REVIEWED",
+    "NOT_FULL_SCOPE2_COMPLIANCE"
+  ],
+  "activity_statuses": [
+    "SYNTHETIC"
+  ],
+  "coverage_scope": "DECLARED_PACKAGE_ONLY_NOT_ORGANIZATIONAL_COMPLETENESS",
+  "reviewer_identity": "SELF_REPORTED_NOT_AUTHENTICATED",
+  "factor": {
+    "factor_id": "ZA_NGGEF_2024_DFFE_2026",
+    "value": "0.960",
+    "unit": "tCO2e/MWh",
+    "country": "ZA",
+    "data_year": 2024,
+    "boundary": "SCOPE2_LOCATION_BASED_PURCHASED_ELECTRICITY",
+    "source_url": "https://www.gov.za/sites/default/files/gcis_document/202609/55353gon7891.pdf",
+    "source_title": "South Africa 2024 Grid Emission Factors Report",
+    "source_locator": "Table 1, printed page 3; Appendix A, printed page 19",
+    "published_on": "2026-09-11",
+    "gwp_basis": "IPCC Second Assessment Report",
+    "uncertainty": "NOT_QUANTIFIED_IN_SOURCE",
+    "transcription_status": "MANUALLY_TRANSCRIBED_OFFICIAL_SOURCE"
+  },
+  "additional_report_limitations": "UNVERIFIED_USER_ASSERTIONS_NOT_SCOPE_OVERRIDES"
+}

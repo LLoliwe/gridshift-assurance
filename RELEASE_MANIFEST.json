@@ -1,0 +1,127 @@
+{
+  "status": "EXACT_OWNER_REVIEW_CANDIDATE_NOT_PUBLICLY_AUTHORIZED",
+  "target_repository": "LLoliwe/gridshift-assurance",
+  "existing_approved_commit": "f0010c700790c1d4243d772e3136511bf39963d2",
+  "existing_33_files_unchanged": true,
+  "total_additional_files_including_manifest": 24,
+  "preventive_private_lifecycle_patch": "EXCLUDED_PENDING_ACTUAL_BROWSER_QA",
+  "code_licence_proposed": "Existing MIT, copyright Pryntor (Pty) Ltd; exact owner approval required",
+  "third_party_facts": "Small attributed Exxaro factual extract; no workbook open-data/MIT licence asserted",
+  "files": [
+    {
+      "path": "docs/RECONCILIATION.md",
+      "bytes": 4728,
+      "sha256": "f97f0fb23ec4b7a1297545a06ade45b06eb2c6b3ed4787721f7e6c46b1ba80c7"
+    },
+    {
+      "path": "source-exhibit/DURNACOL_LIMITED_FACTS.json",
+      "bytes": 1703,
+      "sha256": "6f27684610824c21baa172918a43e6d6eb9880df6fa54aaa9ec8f522f7eae6d4"
+    },
+    {
+      "path": "source-exhibit/MANIFEST.json",
+      "bytes": 358,
+      "sha256": "db3ee2d8db3ebde15eb1a4960b82343e42b9b0367ad2ec540b3e6ab029c6fbdc"
+    },
+    {
+      "path": "source-exhibit/README.md",
+      "bytes": 2931,
+      "sha256": "d0c2e1f414ffa7a548c8cc1c04219faa0a8d0844b5b532a8f632d89280031d26"
+    },
+    {
+      "path": "source-exhibit/replay.py",
+      "bytes": 5169,
+      "sha256": "96ebb487b6f6db516119c1bf21eac0d80caf88f99a6cd9a7b61193efa3312288"
+    },
+    {
+      "path": "source-exhibit/test_replay.py",
+      "bytes": 1815,
+      "sha256": "11c49de0a8286cebd1e85478dcd2af7f6c04052db949513b26f2a3e917cc19b4"
+    },
+    {
+      "path": "src/reconciliation.py",
+      "bytes": 16490,
+      "sha256": "5f328d7f9acb4aa955ca2da64279a26dd6754a5ed93ee46c43a3ec97f87996cd"
+    },
+    {
+      "path": "tests/test_reconciliation_adversarial_development.py",
+      "bytes": 8402,
+      "sha256": "238c425f4c7e3a13c7ae147787ba5e5fe524dfee9ccba5ae4267089b1af39050"
+    },
+    {
+      "path": "tests/test_reconciliation_development.py",
+      "bytes": 7270,
+      "sha256": "c2dacfa58373c1da58541c1013d616214a94f357a7e3acb67730a53f9aa725ff"
+    },
+    {
+      "path": "web/engine/fixtures/za_grid_factor_2024.json",
+      "bytes": 620,
+      "sha256": "13f30d6c4b20bcefee4bb26dae1ca30aa5ba32ea4fdb1717e718ce5389ca14d3"
+    },
+    {
+      "path": "web/engine/src/emissions.py",
+      "bytes": 16461,
+      "sha256": "82f8e3e9a99f6fa354fa3be097d764e475159ff8bbd3c300733a1215e0a85655"
+    },
+    {
+      "path": "web/engine/src/reconciliation.py",
+      "bytes": 16490,
+      "sha256": "5f328d7f9acb4aa955ca2da64279a26dd6754a5ed93ee46c43a3ec97f87996cd"
+    },
+    {
+      "path": "web/engine-controller.js",
+      "bytes": 3828,
+      "sha256": "2c22e7cf44ef5d98699918f4707a0ebc95869acb58377dd698fb0f9a39b40e7e"
+    },
+    {
+      "path": "web/index.html",
+      "bytes": 321,
+      "sha256": "05a841db371bbbd80ffab2add09b230f0066b6b08cde5a7a78e1850bc7fde96e"
+    },
+    {
+      "path": "web/reconcile/flagship.json",
+      "bytes": 2610,
+      "sha256": "c997faff46efaf53c05c68066860da3ec9c411f7004c66be83c978fc329968a6"
+    },
+    {
+      "path": "web/reconcile/index.html",
+      "bytes": 4969,
+      "sha256": "402e7e43d59ce9e7b54e495e4d5b8187d735c61bfbf668174e696ad24e77838c"
+    },
+    {
+      "path": "web/reconcile/missing-edge.json",
+      "bytes": 2606,
+      "sha256": "1ebc2ed411fd21c3bc560df0584caf4cb116dc849393d80e0334db200285d6b6"
+    },
+    {
+      "path": "web/reconcile/reconcile-ui.js",
+      "bytes": 9806,
+      "sha256": "e8893b7b3a0d640fa08bee944d01b1e63b6eb91bad7e87a2f0379ae6b104a3dc"
+    },
+    {
+      "path": "web/reconcile/reconcile.css",
+      "bytes": 5717,
+      "sha256": "b7be3bf93c30bc48ba05b04e23e5f95e56300b51cb96d8634bc3eae3885aaebe"
+    },
+    {
+      "path": "web/reconciliation-worker.js",
+      "bytes": 4217,
+      "sha256": "600d4945c8be343be17c6886a10540b2b956631568c23547bca2fd9cdacf2752"
+    },
+    {
+      "path": "web-tests/flagship-proposal.json",
+      "bytes": 4019,
+      "sha256": "de4b744e91e0bcacf37bf717edc33377442f4a76f45a7b4c9f2158d5e58f6467"
+    },
+    {
+      "path": "web-tests/test_bridge.py",
+      "bytes": 1575,
+      "sha256": "dc719813f4f1b720e0bc458cc3348bf95aa8eaeb90454730e82e3ee64b4cb03d"
+    },
+    {
+      "path": "web-tests/ui-lifecycle.mjs",
+      "bytes": 6616,
+      "sha256": "fb28a7f0b818f746286b07d31b246254d60c985232962a24bfb55e351a2b82c7"
+    }
+  ]
+}
