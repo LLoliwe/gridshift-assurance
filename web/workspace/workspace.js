@@ -1,22 +1,24 @@
 import {EngineController} from './engine-controller.js';
 import LIMITS from './intake-limits.json' with {type:'json'};
-import {WorkspaceState,copy,diff,blankPackage,blankRecord,blankCoverage,RECORD_FIELDS,SCOPE_FIELDS,evidenceGuide} from './workspace-state.js';
+import {WorkspaceState,copy,diff,blankPackage,blankRecord,blankCoverage,RECORD_FIELDS,SCOPE_FIELDS,evidenceGuide,isSchemaRejection,releaseEvidence,describeAffected} from './workspace-state.js';
 const $=id=>document.getElementById(id);
 const el=(tag,value,cls)=>{const node=document.createElement(tag);if(value!==undefined)node.textContent=String(value??'');if(cls)node.className=cls;return node;};
-const state=new WorkspaceState();let engine,pendingToken=null,waitingOpen=null,openSequence=0,loadingFile=false,operationTimer=null,selectedRecord=0,downloadKind=null,creatingCase=false;
+const state=new WorkspaceState();let engine,pendingToken=null,waitingOpen=null,openSequence=0,loadingFile=false,operationTimer=null,selectedRecord=0,downloadKind=null,creatingCase=false,quarantine=null;
 const display=value=>typeof value==='string'?value:JSON.stringify(value);
 const metric=(label,report)=>{const node=el('div',undefined,'metric result-metric');node.append(el('span',label),el('strong',`${report.emissions_tco2e} tCO₂e`),el('p',`${report.energy_mwh} MWh · conditional inventory estimate`));return node;};
 function notice(message,detail=null){$('notice').textContent=message;$('notice-details').hidden=!detail;$('notice-details').open=false;$('notice-trace').textContent=detail||'';}
 function buttons(){
  const ready=engine?.state==='ready'&&!loadingFile&&!waitingOpen&&!state.pending;
  const existing=Boolean(state.case),draft=Boolean(state.draft);
- $('run').disabled=!(ready&&existing&&!draft);$('save-draft').disabled=!(ready&&existing&&!draft);
- $('accept').disabled=!(ready&&state.canAccept());
- $('export-case').disabled=$('export-summary').disabled=!(ready&&state.last&&!draft);
- $('revise').disabled=!existing||draft||loadingFile; // Editing can deliberately invalidate an in-flight review.
+ const held=Boolean(quarantine); // Quarantine is inspection only: no calculation, proposal, acceptance or revision.
+ $('run').disabled=held||!(ready&&existing&&!draft);$('save-draft').disabled=held||!(ready&&existing&&!draft);
+ $('accept').disabled=held||!(ready&&state.canAccept());
+ $('export-case').disabled=$('export-summary').disabled=held||!(ready&&state.last&&!draft);
+ $('revise').disabled=held||!existing||draft||loadingFile;
+ $('quarantine-export').disabled=$('quarantine-view').disabled=!(ready&&held); // Editing can deliberately invalidate an in-flight review.
  $('download-original').disabled=!existing;
  $('retry').hidden=!['failed','suspended'].includes(engine?.state);
- $('confirm').disabled=!ready;
+ $('confirm').disabled=held||!ready;
  $('save-revision').disabled=loadingFile;
  const runtimeUp=['ready','checking'].includes(engine?.state);
  for(const id of ['case-file','new-case','example','load-example'])$(id).disabled=!runtimeUp;
@@ -75,6 +77,7 @@ function renderResult(message){
  const r=message.result;if(!r){clearResult(message.notice||'Run a fresh Python review.');return;}
  $('result').replaceChildren();$('confirm').checked=false;state.confirmed=false;
  const accepted=r.resolution_accepted===true;
+ if(message.presentation?.outcome==='SCHEMA_REJECTION'||isSchemaRejection(r)){renderSchemaRejection(r);return;}
  $('decision-title').textContent=r.decision==='WITHHOLD'?'More evidence required':r.decision==='CORRECT'?'Correction proposed':accepted?'Exact correction accepted':'Consistent with the policy';
  $('decision-status').dataset.state=r.decision==='WITHHOLD'?'withheld':r.decision==='CORRECT'?'proposed':'accepted';
  $('decision-status').textContent=r.decision==='WITHHOLD'?'Withheld':r.decision==='CORRECT'?'Not yet accepted':accepted?'Reviewer confirmation recorded':'Not a human approval';
@@ -82,13 +85,34 @@ function renderResult(message){
  if(r.decision!=='WITHHOLD'){const report=r.accepted_report||r.proposed_report;if(report)$('result').append(metric(r.accepted_report?'SUPPORTED WITHIN CALCULATION POLICY':'PROPOSED — ACCEPTANCE REQUIRED',report));}
  if(r.discrepancy)$('result').append(el('p',`Absolute report difference: ${r.discrepancy.absolute_emissions_tco2e} tCO₂e. This is a report correction, not emissions saved. Prototype triage threshold: ${r.discrepancy.materiality_threshold_tco2e} tCO₂e; not an audit standard.`,'source-caption'));
  const findings=el('ul',undefined,'findings');for(const f of r.findings||[]){const li=el('li');li.append(el('strong',f.code),el('p',f.message));if(f.record_ids?.length)li.append(el('p',`Affected records: ${f.record_ids.join(', ')}`));findings.append(li);}if(findings.children.length){$('result').append(el('h3','What needs checking'),findings);}
- if(r.required_evidence?.length){$('result').append(el('h3','What evidence is missing?'));for(const evidence of r.required_evidence)$('result').append(el('p',typeof evidence==='string'?evidence:JSON.stringify(evidence)));}
+ if(r.decision==='WITHHOLD'){const release=releaseEvidence(r,state.case?.working.records);const box=el('section',undefined,'release');box.id='release';box.append(el('h3','What evidence would release this?'));
+ if(release){for(const t of release.engine)box.append(el('p',`Engine requirement: ${t}`));if(release.affected.length){const ul=el('ul');for(const a of release.affected)ul.append(el('li',describeAffected(a)));box.append(el('p','Applies to these declared source records:'),ul);}box.append(el('p','Requirement text and record IDs come from the engine; meter and period are your own declarations. Provide source-backed evidence; do not change the unit without it.','source-caption'));}
+ else box.append(el('p','The engine did not state what evidence would release this result, so none is suggested here.'));$('result').append(box);}
+ else if(r.required_evidence?.length){$('result').append(el('h3','What evidence is missing?'));for(const evidence of r.required_evidence)$('result').append(el('p',typeof evidence==='string'?evidence:JSON.stringify(evidence)));}
  if(r.trace?.length){$('result').append(el('h3','Why each record is used'));for(const trace of r.trace){const row=el('div',undefined,'trace-row');row.append(el('strong',`${trace.record_id} · ${trace.included?'included':'excluded, retained'}`),el('span',`${trace.action}${trace.target_record_id?` → ${trace.target_record_id}`:''}`),el('span',trace.reason),el('small',`${trace.source_id} · ${trace.source_status}`));$('result').append(row);}}
  const details=el('details',undefined,'advanced');details.append(el('summary','Exact Python result and all limitations'),el('pre',JSON.stringify(r,null,2)));$('result').append(details);
  $('acceptance').hidden=r.decision!=='CORRECT';$('proposal-hash').textContent=r.proposal_sha256||'';
  const proposed=r.proposed_report;$('proposal-description').textContent=proposed?`Proposed report: ${proposed.energy_mwh} MWh / ${proposed.emissions_tco2e} tCO₂e. Included: ${(r.included_record_ids||[]).join(', ')}. Excluded, not deleted: ${(r.excluded_record_ids||[]).join(', ')||'none'}.`:'';
  renderEvidence();renderGuide();buttons();
 }
+function renderSchemaRejection(r){
+ // Distinct from WITHHOLD: the declarations were not admitted to the policy, so there is no decision at all.
+ $('decision-title').textContent='Schema rejection: not calculated';$('decision-status').dataset.state='schema-rejected';$('decision-status').textContent='Schema rejected';
+ $('decision-label').textContent='The declarations do not match the supported schema, so no calculation ran and no total exists. This is not a “More evidence required” result. Correct the structure at its source, then reopen and rerun.';
+ const findings=el('ul',undefined,'findings');for(const f of r.findings||[]){const li=el('li');li.append(el('strong','Schema problem'),el('p',f.message));if(f.record_ids?.length)li.append(el('p',`Affected records: ${f.record_ids.join(', ')}`));findings.append(li);}
+ $('result').append(el('h3','Why the schema was rejected'),findings);
+ const details=el('details',undefined,'advanced');details.append(el('summary','Exact Python result (the protected engine labels this internally as WITHHOLD / INVALID_SCHEMA; it is a schema rejection)'),el('pre',JSON.stringify(r,null,2)));$('result').append(details);
+ $('acceptance').hidden=true;$('proposal-hash').textContent='';renderEvidence();renderGuide();buttons();
+}
+function showQuarantine(record,message){
+ quarantine=record;$('quarantine').hidden=false;$('quarantine-text').hidden=true;$('quarantine-text').textContent='';
+ $('quarantine-facts').replaceChildren();
+ for(const [k,v] of [['Intake message',record.rejection?.adapter_message||'Rejected at intake.'],['Original bytes',`${record.original.byte_length} bytes, kept exactly`],['Original SHA-256',record.original.raw_sha256],['Intake result','Schema rejection (no engine decision)'],['Quarantined at (UTC)',record.quarantined_at_utc]]){$('quarantine-facts').append(el('dt',k),el('dd',v));}
+ $('quarantine-reasons').replaceChildren();const reasons=record.rejection?.reasons?.length?record.rejection.reasons:[{code:'REJECTED',path:null,message:record.rejection?.adapter_message}];
+ for(const reason of reasons){const li=el('li');li.append(el('strong',`${reason.code}${reason.path?` at ${reason.path}`:''}`),el('p',reason.message||''));$('quarantine-reasons').append(li);}
+ notice(message);buttons();$('quarantine-title').focus({preventScroll:false});
+}
+function closeQuarantine(){quarantine=null;$('quarantine').hidden=true;$('quarantine-text').textContent='';buttons();}
 function dispatch(request){
  if(engine.state!=='ready')return false;
  pendingToken=state.begin(request.operation);const started=engine.review(request);
@@ -96,14 +120,14 @@ function dispatch(request){
  clearTimeout(operationTimer);operationTimer=setTimeout(()=>{if(engine.state==='checking'){state.generation++;state.pending=null;pendingToken=null;engine.suspend();clearResult('The worker did not respond in time. Retry the runtime and rerun.');notice('No result or acceptance was recorded for the interrupted request. Your case remains in memory.');buttons();}},90000);
  buttons();return true;
 }
-function flushOpen(){if(waitingOpen&&engine.state==='ready'){const raw=waitingOpen;waitingOpen=null;dispatch({operation:'open',raw});}}
+function flushOpen(){if(waitingOpen&&engine.state==='ready'){const raw=waitingOpen;waitingOpen=null;dispatch({operation:'intake',raw});}} // Bounded intake: supported input opens; rejected input is quarantined.
 async function openBytes(bytes,sequence){
  if(sequence!==openSequence)return;
  loadingFile=false;state.generation++;state.pending=null;pendingToken=null;engine.invalidate();state.confirmed=false;$('confirm').checked=false;
  waitingOpen=bytes;notice('Validating original raw bytes with the strict Python loader. The existing case stays intact if intake fails.');buttons();flushOpen();
 }
 function beginIntake(){
- waitingOpen=null;loadingFile=true;engine.invalidate();state.invalidate();pendingToken=null;clearResult('Opening another case. Previous evidence remains visible, but its review and approval are invalidated.');notice('Reading a new case. Earlier responses are ignored immediately; the preserved evidence remains until strict intake succeeds.');renderHistory();buttons();
+ closeQuarantine();waitingOpen=null;loadingFile=true;engine.invalidate();state.invalidate();pendingToken=null;clearResult('Opening another case. Previous evidence remains visible, but its review and approval are invalidated.');notice('Reading a new case. Earlier responses are ignored immediately; the preserved evidence remains until strict intake succeeds.');renderHistory();buttons();
 }
 async function readFile(file){
  const sequence=++openSequence;if(!file)return;beginIntake();if(file.size===0||file.size>LIMITS.envelope_limit_bytes){loadingFile=false;notice(LIMITS.open_size_message+' Raw input packages are limited to 64 KiB. Previous evidence is intact; rerun its review before use.');buttons();return;}
@@ -113,14 +137,22 @@ function download(content,name,type){const url=URL.createObjectURL(new Blob([con
 function safeName(){return (state.case?.working.package_id||'case').replace(/[^a-zA-Z0-9_-]/g,'_').slice(0,80)||'case';}
 function received(message){
  clearTimeout(operationTimer);const token=pendingToken;pendingToken=null;
+ if(message.state==='QUARANTINED'||message.operation==='quarantine_view'||message.operation==='quarantine_export'){
+  // Side responses never replace the in-memory case; the previous case stays intact (and still needs a rerun).
+  if(!state.acknowledge(token))return;
+  if(message.operation==='intake')showQuarantine(message.quarantine,`Not opened: the file was rejected at intake and is quarantined for inspection only.${state.case?' The previous case is intact, but rerun is required.':' No case is open.'}`);
+  else if(message.operation==='quarantine_view'){$('quarantine-text').textContent=message.display_text;$('quarantine-text').hidden=false;notice(message.display_is_exact_utf8?'Display only. The exact bytes, not this text, are the evidence.':'Display only. Invalid UTF-8 bytes are shown escaped; the exact bytes are kept in the diagnostic export.');}
+  else{download(message.text,message.filename,'application/json');notice(`Diagnostic export downloaded (SHA-256 ${message.export_sha256}). It states that no calculation, proposal or acceptance occurred.`);}
+  buttons();return;
+ }
  if(!state.receive(token,message))return;
- if(message.operation==='open'){
+ if(message.operation==='open'||message.operation==='intake'){
   selectedRecord=0;$('revision-editor').hidden=true;renderEvidence();clearResult(message.notice);notice(message.notice);
   if(message.case.working.package_id===''){creatingCase=true;startDraft();$('revision-title').textContent='Enter the original report and declarations';$('save-revision').textContent='Create original case';$('revision-reason').required=false;notice('Enter your original declarations. Nothing here is approved; the original is established only when you choose Create original case.');}else creatingCase=false;
  }else if(message.operation==='save'){
   clearResult('An unreviewed draft was saved. Rerun before relying on a decision.');download(message.export_json,`${safeName()}-draft.json`,'application/json');notice('Unreviewed draft downloaded. Reopen will validate the original and require a fresh review.');
  }else{
-  renderResult(message);notice(message.operation==='accept'?'Exact proposal acceptance confirmed by the Python rerun. Originals are unchanged.':message.result.decision==='WITHHOLD'?'Review withheld. Supply the specific missing evidence; no total has been invented.':'Python review complete. Inspect the decision and declared evidence.');
+  renderResult(message);notice(message.operation==='accept'?'Exact proposal acceptance confirmed by the Python rerun. Originals are unchanged.':(message.presentation?.outcome==='SCHEMA_REJECTION'||isSchemaRejection(message.result))?'Schema rejection: the declarations do not match the supported schema. Nothing was calculated; this is not a withheld result.':message.result.decision==='WITHHOLD'?'Review withheld. Supply the specific missing evidence; no total has been invented.':'Python review complete. Inspect the decision and declared evidence.');
   if(message.operation==='export'){
    if(downloadKind==='summary')download(message.summary,`${safeName()}-review.txt`,'text/plain;charset=utf-8');
    else download(message.export_json,`${safeName()}-review.case.json`,'application/json');
@@ -138,7 +170,8 @@ function runtime(next){
  if(next==='ready'){clearTimeout(operationTimer);queueMicrotask(flushOpen);}buttons();
 }
 function failure({phase,message,detail=null}){
- clearTimeout(operationTimer);const opening=pendingToken?.operation==='open';state.pending=null;pendingToken=null;downloadKind=null;
+ clearTimeout(operationTimer);const operation=pendingToken?.operation,opening=operation==='open'||operation==='intake',side=operation==='quarantine_view'||operation==='quarantine_export';state.pending=null;pendingToken=null;downloadKind=null;
+ if(side){notice(`Quarantine action failed; nothing was calculated. ${message}`,detail);buttons();return;}
  if(!opening){state.invalidate();clearResult('No current result. Retry or rerun before relying on this case.');}
  notice(`${opening?'Case was not opened; the previous case is intact, but rerun is required. ':''}${message}`,detail);buttons();
 }
@@ -188,6 +221,9 @@ function startDraft(){
 engine=new EngineController({workerFactory:()=>new Worker(new URL('./workspace-worker.js',import.meta.url),{type:'module'}),onState:runtime,onResult:received,onError:failure});
 $('case-file').addEventListener('change',()=>{const file=$('case-file').files?.[0];if(file)readFile(file);$('case-file').value='';});
 $('load-example').addEventListener('click',async()=>{const sequence=++openSequence;beginIntake();try{const name=$('example').value;if(!['missing-edge','flagship'].includes(name))throw Error('Unknown example.');const response=await fetch(`../reconcile/${name}.json`,{cache:'no-store'});if(!response.ok)throw Error('Invented example could not be loaded.');await openBytes(new Uint8Array(await response.arrayBuffer()),sequence);}catch(error){if(sequence===openSequence){loadingFile=false;notice(String(error.message));buttons();}}});
+$('quarantine-export').addEventListener('click',()=>{if(quarantine)dispatch({operation:'quarantine_export',quarantine});});
+$('quarantine-view').addEventListener('click',()=>{if(quarantine)dispatch({operation:'quarantine_view',quarantine});});
+$('quarantine-close').addEventListener('click',()=>{closeQuarantine();notice(state.case?'Quarantine closed. The previous case is intact; rerun before relying on it.':READY_NOTICE);});
 $('new-case').addEventListener('click',()=>{const sequence=++openSequence;beginIntake();openBytes(new TextEncoder().encode(JSON.stringify(blankPackage())),sequence);});
 $('run').addEventListener('click',()=>{if($('run').disabled)return;const c=copy(state.case);clearResult('Waiting for the actual Python result.');dispatch({operation:'review',case:c});});
 $('reviewer').addEventListener('input',()=>{state.reviewerChanged($('reviewer').value);engine.invalidate();clearResult('Reviewer identifier changed. Rerun before accepting this exact correction.');notice('Reviewer changed. Previous approval eligibility is cleared; rerun to obtain a current proposal.');renderHistory();});

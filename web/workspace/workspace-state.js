@@ -11,6 +11,8 @@ export class WorkspaceState {
    this.case.working.resolutions=[];
   }
  }
+ /** Accept a side response (quarantine) without replacing the in-memory case. */
+ acknowledge(token){if(!token||this.pending!==token||token.generation!==this.generation)return false;this.pending=null;return true;}
  begin(operation){this.confirmed=false;const token={generation:this.generation,operation};this.pending=token;return token;}
  receive(token,message){
   if(!token||this.pending!==token||token.generation!==this.generation)return false;
@@ -47,9 +49,25 @@ export const LIMITATIONS=['NOT_AN_INDEPENDENT_VERIFICATION','NOT_BLOCKCHAIN','NO
 export function blankPackage(){return {schema_version:'gridshift.reconciliation.input.v1',package_id:'',records:[],coverage:[],report:{claim_type:'CONDITIONAL_INVENTORY_ESTIMATE',energy_mwh:'',emissions_tco2e:'',factor_id:'ZA_NGGEF_2024_DFFE_2026',data_year:2024,boundary:'SCOPE2_LOCATION_BASED_PURCHASED_ELECTRICITY',activity_statuses:[],limitations:[...LIMITATIONS]},resolutions:[]};}
 export function blankRecord(){return Object.fromEntries(RECORD_FIELDS.map(k=>[k,k==='target_record_id'?null:'']));}
 export function blankCoverage(){return Object.fromEntries(SCOPE_FIELDS.map(k=>[k,'']));}
+/** The protected engine labels a schema failure WITHHOLD + INVALID_SCHEMA; the UI never presents that as WITHHOLD. */
+export function isSchemaRejection(result){return result?.decision==='WITHHOLD'&&Array.isArray(result.findings)&&result.findings.some(f=>f?.code==='INVALID_SCHEMA');}
+// What would release a WITHHOLD, using only what the engine reports (required_evidence text and the
+// finding's record_ids) joined to the reviewer's own declared records. Nothing is inferred or invented:
+// with no engine required_evidence, this returns null and the UI says so.
+export function releaseEvidence(result,records){
+ if(!result||result.decision!=='WITHHOLD'||isSchemaRejection(result))return null;
+ const engine=(Array.isArray(result.required_evidence)?result.required_evidence:[]).map(e=>typeof e==='string'?e:JSON.stringify(e));
+ if(!engine.length)return null;
+ const ids=[...new Set((result.findings||[]).flatMap(f=>Array.isArray(f.record_ids)?f.record_ids:[]))];
+ const list=Array.isArray(records)?records:[];
+ const affected=ids.map(id=>{const r=list.find(x=>x&&x.record_id===id);return r?{record_id:id,meter_id:r.meter_id,period_start:r.period_start,period_end:r.period_end,declared_unit:r.unit}:{record_id:id};});
+ return {engine,affected};
+}
+export function describeAffected(a){return a.meter_id===undefined?`Record ${a.record_id}`:`Record ${a.record_id}: meter ${a.meter_id}, ${a.period_start} to ${a.period_end} (end exclusive), currently declared in ${a.declared_unit}`;}
 export function evidenceGuide(result){
  if(!result)return {title:'Start with the declared evidence',why:'Run the actual Python review before relying on a finding.',next:'Open a case or enter declarations. Inspect the report, records and explicit coverage. No evidence is inferred.',recordIds:[]};
  const first=result.findings?.[0];
+ if(isSchemaRejection(result))return {title:'Schema rejection: nothing was calculated',why:first?.message||'The declarations do not match the supported schema.',next:'Correct the structure at its source (do not invent evidence), then reopen and rerun. This is not a request for more evidence.',recordIds:Array.isArray(first?.record_ids)?first.record_ids:[]};
  if(result.decision==='WITHHOLD')return {title:'More evidence is required',why:first?.message||'The policy could not support a result.',next:'Inspect the affected declared sources. Record a revision only when you have source-backed evidence, then rerun. This is the first blocker; further issues may remain.',recordIds:Array.isArray(first?.record_ids)?first.record_ids:[]};
  if(result.decision==='CORRECT')return {title:'Check the exact correction',why:first?.message||'The declared record set supports a correction to the report.',next:'Compare the original report, included/excluded records and proposal. Only you can confirm this exact proposal. The guide cannot edit or approve it.',recordIds:Array.isArray(first?.record_ids)?first.record_ids:[]};
  return {title:result.resolution_accepted?'Your exact confirmation was recorded':'Consistent with this calculation policy',why:result.resolution_accepted?'Python reran and accepted the matching proposal. Reviewer identity remains self-reported.':'No correction is required within the supported policy. This does not imply a human approval.',next:'Download the readable handoff and companion case. The next reviewer must reopen and recompute; imported acceptance is history only.',recordIds:[]};

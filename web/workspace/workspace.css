@@ -185,7 +185,7 @@ footer { margin-top: 28px; padding-top: 18px; border-top: 1px solid var(--line);
 .scope-strip span { color: var(--muted); }
 .intro { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; }
 .intro .eyebrow { margin-bottom: 9px; }
-.private-label { flex: 0 0 auto; margin-top: 4px; padding: 4px 8px; border: 1px solid #a4afb7; color: var(--muted); font-size: 11px; }
+.private-label { flex: 0 0 auto; margin-top: 4px; padding: 0; border: 0; background: none; color: var(--muted); font-size: 11px; letter-spacing: .04em; text-transform: uppercase; } /* plain label, not a button */
 .open-control { display: flex; align-items: end; flex-wrap: wrap; gap: 12px; flex: 1 1 340px; min-width: 0; }
 .file-label { flex: 1 1 210px; min-width: 0; max-width: 340px; }
 .example-control { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 6px 10px; flex: 1 1 310px; min-width: 0; }
@@ -244,3 +244,18 @@ footer { margin-top: 28px; padding-top: 18px; border-top: 1px solid var(--line);
 .status-chip#runtime[data-state="failed"], .status-chip#runtime[data-state="suspended"] { color: #87331f; }
 .notice-details { margin: .25rem 0 0; font-size: .85rem; }
 .notice-details pre { max-height: 12rem; overflow: auto; white-space: pre-wrap; word-break: break-word; }
+
+/* Quarantine (inspection only) and schema rejection: visually distinct from WITHHOLD. */
+.quarantine { border: 1px solid #b9a3c9; border-left: 4px solid #6b4a86; background: #f6f2f9; padding: 18px 20px; margin: 18px 0; }
+.quarantine h3 { font-size: 14px; margin: 16px 0 4px; }
+.quarantine-facts { display: grid; grid-template-columns: max-content 1fr; gap: 4px 14px; font-size: 13px; margin: 12px 0 0; }
+.quarantine-facts dt { color: var(--muted); }
+.quarantine-facts dd { margin: 0; overflow-wrap: anywhere; font-family: ui-monospace, monospace; }
+.quarantine-facts dt, .quarantine-facts dd { margin: 0; padding: 0; line-height: 1.45; align-self: baseline; }
+.quarantine-facts dd:first-of-type { font-family: inherit; }
+.quarantine-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+.quarantine-actions button:disabled { opacity: .55; cursor: not-allowed; }
+.quarantine-text { max-height: 260px; overflow: auto; background: #fff; border: 1px solid var(--line); padding: 10px; font-size: 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.status-chip[data-state="quarantined"], .status-chip[data-state="schema-rejected"] { color: #4f2f69; background: #efe7f5; border-color: #b9a3c9; }
+@media (max-width: 600px) { .quarantine-facts { grid-template-columns: 1fr; } .quarantine-facts dd { margin-bottom: 6px; } }
+.release{border-left:4px solid var(--warn,#b45309);padding:.25rem 0 .25rem 1rem;margin:1rem 0}.release h3{margin-top:0}

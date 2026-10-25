@@ -70,35 +70,66 @@ test('real worker/Pyodide synthetic correction, acceptance, export and distrust 
   console.log('Synthetic correction/accept/export/reopen and viewport geometry passed; owner visual and assistive-tech acceptance NOT established.');
 });
 
-// Regression (round 2): intake refusals show only the user-facing message; the Python traceback is
-// kept in a collapsed "Technical details" disclosure. Mirrors adversarial C12 and C14.
-test('refusal notice never shows a Python traceback (C12 float year, C14 big integer)', async ({ page }) => {
+// Regression (rounds 2-3): C12/C14 are quarantined at intake. The user sees the quarantine panel with
+// reasons and no Python traceback; calculation controls are disabled; export is a diagnostic only.
+test('intake quarantine never shows a Python traceback (C12 float year, C14 big integer)', async ({ page }) => {
   const flag = readFileSync(new URL('../web/reconcile/flagship.json', import.meta.url), 'utf8');
   const c12 = flag.replace('"data_year": 2024', '"data_year": 2024.0');
   const p = JSON.parse(flag); p.report.unreviewed_extension = '__BIG__';
   const c14 = JSON.stringify(p, null, 2).replace('"__BIG__"', '18446744073709551617');
   expect(c12).not.toBe(flag);
   const cases = [
-    ['C12_float_year', c12, /data_year at \$\.report\.data_year .*JSON integer 2024/],
-    ['C14_big_int_unknown_field', c14, /JavaScript transport limit/],
+    ['C12_float_year', c12, /FLOAT_OR_EXPONENT_NUMBER at \$\.report\.data_year/],
+    ['C14_big_int_unknown_field', c14, /INTEGER_OUTSIDE_PORTABLE_RANGE|JavaScript transport limit/],
   ];
   for (const [id, body, expected] of cases) {
     await page.goto('/workspace/');
     await expect(page.locator('#runtime')).toHaveText('Ready', { timeout: 120_000 });
     await page.locator('#case-file').setInputFiles({ name: `${id}.json`, mimeType: 'application/json', buffer: Buffer.from(body) });
-    const notice = page.locator('#notice');
-    await expect(notice).toContainText('Case was not opened', { timeout: 60_000 });
-    const text = await notice.textContent();
-    expect(text, `${id} notice`).not.toContain('Traceback');
-    expect(text, `${id} notice`).not.toContain('File "');
-    expect(text).toMatch(expected);
-    const details = page.locator('#notice-details');
-    await expect(details).toBeVisible();
-    expect(await details.evaluate(d => d.open)).toBe(false);
-    await expect(page.locator('#notice-trace')).toBeHidden();
-    await details.locator('summary').click();
-    await expect(page.locator('#notice-trace')).toContainText('Traceback (most recent call last):');
+    const panel = page.locator('#quarantine');
+    await expect(panel).toBeVisible({ timeout: 60_000 });
+    await expect(page.locator('#quarantine-title')).toHaveText('File quarantined: not opened');
+    const all = `${await panel.textContent()} ${await page.locator('#notice').textContent()}`;
+    expect(all, id).not.toContain('Traceback');
+    expect(all, id).not.toContain('File "');
+    for (const c of ['#quarantine-title', '#quarantine-status', '#quarantine-facts', '#quarantine-reasons', '#notice'])
+      expect(await page.locator(c).textContent(), `${id} ${c}`).not.toMatch(/WITHHOLD|Withheld|More evidence required/);
+    await expect(page.locator('#notice')).toHaveText('Not opened: the file was rejected at intake and is quarantined for inspection only. No case is open.');
+    expect(all).toMatch(expected);
+    for (const c of ['#run', '#save-draft', '#accept', '#export-case', '#export-summary']) await expect(page.locator(c)).toBeDisabled();
     await expect(page.locator('#case-workspace')).toBeHidden();
-    console.log(`${id} real-Chromium notice: ${text}`);
+    await page.locator('#quarantine-view').click();
+    await expect(page.locator('#quarantine-text')).toHaveText(body);
+    const dl = page.waitForEvent('download');
+    await page.locator('#quarantine-export').click();
+    const download = await dl;
+    expect(download.suggestedFilename()).toMatch(/^gridshift-quarantine-[0-9a-f]{12}\.json$/);
+    const diag = JSON.parse(readFileSync(await download.path(), 'utf8'));
+    expect(JSON.stringify(diag)).toContain('NO CALCULATION, NO PROPOSAL AND NO ACCEPTANCE OCCURRED');
+    await page.locator('#quarantine-close').click();
+    await expect(panel).toBeHidden();
+    console.log(`${id} real-Chromium quarantine: ${(await page.locator('#notice').textContent())}`);
   }
+});
+
+test('C30 schema failure is presented as a schema rejection; E1-W10 names engine-stated releasing evidence', async ({ page }) => {
+  const flag = readFileSync(new URL('../web/reconcile/flagship.json', import.meta.url), 'utf8');
+  const c30 = flag.replace('"record_id"', '"__proto__": "x", "record_id"');
+  const w10 = readFileSync(new URL('../lane-b/e1-frozen/cases/E1-W10.json', import.meta.url));
+  await page.goto('/workspace/');
+  await expect(page.locator('#runtime')).toHaveText('Ready', { timeout: 120_000 });
+  const label = await page.locator('.private-label').first().evaluate(e => getComputedStyle(e).borderTopWidth);
+  expect(label, 'private label is plain text, not a button').toBe('0px');
+  await page.locator('#case-file').setInputFiles({ name: 'C30.json', mimeType: 'application/json', buffer: Buffer.from(c30) });
+  await expect(page.locator('#run')).toBeEnabled({ timeout: 60_000 });
+  await page.locator('#run').click();
+  await expect(page.locator('#decision-title')).toHaveText('Schema rejection: not calculated', { timeout: 60_000 });
+  await expect(page.locator('#decision-status')).toHaveText('Schema rejected');
+  await expect(page.locator('#result')).toContainText('Why the schema was rejected');
+  await page.locator('#case-file').setInputFiles({ name: 'E1-W10.json', mimeType: 'application/json', buffer: w10 });
+  await expect(page.locator('#case-title')).toContainText('E1-W10', { timeout: 60_000 });
+  await page.locator('#run').click();
+  await expect(page.locator('#decision-title')).toHaveText('More evidence required', { timeout: 60_000 });
+  await expect(page.locator('#release')).toContainText('Engine requirement: activity unit must be kWh or MWh');
+  await expect(page.locator('#release')).toContainText('Record A: meter M1, 2024-01-01 to 2025-01-01 (end exclusive), currently declared in ZAR');
 });

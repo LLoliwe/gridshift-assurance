@@ -13,7 +13,7 @@ export const RAW_LIMIT=LIMITS.raw_limit_bytes;
 export const ENVELOPE_LIMIT=LIMITS.envelope_limit_bytes;
 export const REQUEST_LIMIT=2*1024*1024;
 export const LIMITS_SHA256='3fd8c1d1f6992f9c7fdb78ca827d641c4f04e80b45658e0f4dac725ce70fb36a';
-export const ADAPTER_SHA256='d3e29e1964c891661cb8d514032ca7159cfb5b137d730d5b9af4a3f4c4ed3035';
+export const ADAPTER_SHA256='9f03b10bdb319f04675df48f241ff5984a03b93b0bcac8ce21c4e3f4729a519e';
 // AC-5 quarantine modules (web/workspace), pinned like the adapter.
 export const QUARANTINE_ASSETS=Object.freeze([
  ['quarantine_state.py','5eb2bd263b7591206dfe8a6b50ae964a39aed97ae3d0bdccbe578f394e00c619'],

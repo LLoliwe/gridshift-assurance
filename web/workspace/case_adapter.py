@@ -193,8 +193,25 @@ def execute(request):
                               'trust': 'SELF_REPORTED_NOT_AUTHENTICATED'})
     case['cached_review'] = deepcopy(result)
     _bounded_envelope(case)
-    return {'case': case, 'result': result, 'operation': operation,
+    return {'case': case, 'result': result, 'operation': operation, 'presentation': presentation(result),
             'export_json': canonical(case) + '\n', 'summary': summary(case, result)}
+
+
+def is_schema_rejection(result):
+    """The protected engine reports schema failures as decision WITHHOLD with finding INVALID_SCHEMA.
+    That is a schema rejection, never a WITHHOLD policy result, and is presented as such."""
+    return (isinstance(result, dict) and result.get('decision') == 'WITHHOLD'
+            and any(isinstance(f, dict) and f.get('code') == 'INVALID_SCHEMA' for f in result.get('findings') or []))
+
+
+def presentation(result):
+    """User-facing outcome label. Engine output in `result` is passed through unchanged."""
+    if result is None:
+        return None
+    if is_schema_rejection(result):
+        return {'outcome': 'SCHEMA_REJECTION', 'calculation_performed': False,
+                'engine_internal_label': 'WITHHOLD (protected engine; presented as schema rejection)'}
+    return {'outcome': result['decision'], 'calculation_performed': True, 'engine_internal_label': None}
 
 
 def summary(case, result):
@@ -208,6 +225,8 @@ def summary(case, result):
              '', 'CURRENT REVIEW']
     if result is None:
         lines.append('UNREVIEWED DRAFT — no current decision or approval.')
+    elif is_schema_rejection(result):
+        lines.append('SCHEMA REJECTION — the declarations do not match the supported schema; no calculation was performed and no total exists.')
     elif result['decision'] == 'WITHHOLD':
         lines.append('MORE EVIDENCE REQUIRED — no accepted or proposed total.')
     elif result.get('resolution_accepted'):
