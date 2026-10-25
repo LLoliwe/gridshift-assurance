@@ -1,0 +1,72 @@
+{
+  "tariffs": [
+    {
+      "tariff_id": "DEMO-TOU-ZA-01",
+      "utility": "EXAMPLE_CITY_NOT_REAL",
+      "country": "ZA",
+      "currency": "ZAR",
+      "effective_from": "2026-04-01",
+      "effective_to": "2027-04-01",
+      "source_url": "https://www.eskom.co.za/distribution/2026-2027-tariff-increase/",
+      "source_status": "SYNTHETIC",
+      "source_note": "Rates NOT obtained from linked source. URL documents regulatory context only. All numbers INVENTED.",
+      "tax_rate": "0.15",
+      "components": [
+        {
+          "code": "energy_peak",
+          "unit": "kwh_peak",
+          "rate": "3.65"
+        },
+        {
+          "code": "energy_standard",
+          "unit": "kwh_standard",
+          "rate": "1.94"
+        },
+        {
+          "code": "energy_offpeak",
+          "unit": "kwh_offpeak",
+          "rate": "1.07"
+        },
+        {
+          "code": "network_energy",
+          "unit": "kwh_total",
+          "rate": "0.31"
+        },
+        {
+          "code": "capacity",
+          "unit": "demand_kva",
+          "rate": "101.00"
+        },
+        {
+          "code": "service",
+          "unit": "service_days",
+          "rate": "19.00"
+        }
+      ]
+    },
+    {
+      "tariff_id": "DEMO-FLAT-KEN-01",
+      "utility": "EXAMPLE_KEN_NOT_REAL",
+      "country": "KE",
+      "currency": "KES",
+      "effective_from": "2026-01-01",
+      "effective_to": "2027-01-01",
+      "source_url": "https://www.epra.go.ke/",
+      "source_status": "SYNTHETIC",
+      "source_note": "KENYA DEMO; not actual EPRA rates. Tax illustrative, not law.",
+      "tax_rate": "0.10",
+      "components": [
+        {
+          "code": "energy",
+          "unit": "kwh_total",
+          "rate": "18.00"
+        },
+        {
+          "code": "service",
+          "unit": "service_days",
+          "rate": "35.00"
+        }
+      ]
+    }
+  ]
+}

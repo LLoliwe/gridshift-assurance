@@ -1,0 +1,13 @@
+{
+  "name": "Competent fixed-factor accounting worksheet rules baseline v1",
+  "frozen_before_baseline_execution": true,
+  "timing_disclosure": "Authored after viewing the frozen cases and first target/simple-baseline run summary. This baseline is not blinded or pre-registered before case design. Cases remain unchanged.",
+  "design": [
+    "Pin all official-factor fields to the same reviewed fixture, refusing edits, analogous to a protected worksheet factor cell and cited metadata.",
+    "Require explicit synthetic source status, nonempty activity/site/meter identifiers, matching ZA country, finite nonnegative energy and recognized kWh/MWh units.",
+    "Require valid end-exclusive ISO dates within calendar2024; positive interval length.",
+    "Reject duplicate activity identifiers and overlapping periods for identical site/meter keys, permit adjacency and distinct keys.",
+    "Use Decimal arithmetic to normalize energy and multiply the fixed factor; return total only if all input rows pass."
+  ],
+  "claim_limit": "Transparent independently coded rules reference, not a commercial spreadsheet product, field audit, certified baseline or evidence of GRIDSHIFT market superiority. No target internals or existing target tests read."
+}

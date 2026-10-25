@@ -1,0 +1,908 @@
+{
+  "name": "GRIDSHIFT independent authored synthetic challenge v1",
+  "design": "Not random, field data, representative accuracy or competitive product comparison. Author has not read emissions implementation or test internals. Fixtures, function signatures and public review only used.",
+  "baseline": "Simple numeric multiplication baseline: normalizes recognized kWh/MWh, rejects negative/nonfinite quantities or factors, but ignores country/year/factor provenance/boundary/dedup/overlap. Not a claim about all spreadsheets or products.",
+  "expected_semantics": "Accept only same-year ZA purchased-electricity synthetic activities with cited fixed factor, nonnegative finite quantities and unique nonoverlapping records per site/meter. Exact arithmetic with Decimal.",
+  "cases": [
+    {
+      "id": "valid_fractional_mwh",
+      "activities": [
+        {
+          "activity_id": "synthetic-2024-001",
+          "site_id": "DEMO-SITE",
+          "meter_id": "DEMO-METER",
+          "country": "ZA",
+          "period_start": "2024-01-01",
+          "period_end": "2025-01-01",
+          "quantity": "12.345",
+          "unit": "MWh",
+          "source_status": "SYNTHETIC",
+          "source_note": "Invented activity matching official report worked example; not a real customer."
+        }
+      ],
+      "factor": {
+        "factor_id": "ZA_NGGEF_2024_DFFE_2026",
+        "value": "0.960",
+        "unit": "tCO2e/MWh",
+        "country": "ZA",
+        "data_year": 2024,
+        "boundary": "SCOPE2_LOCATION_BASED_PURCHASED_ELECTRICITY",
+        "source_url": "https://www.gov.za/sites/default/files/gcis_document/202609/55353gon7891.pdf",
+        "source_title": "South Africa 2024 Grid Emission Factors Report",
+        "source_locator": "Table 1, printed page 3; Appendix A, printed page 19",
+        "published_on": "2026-09-11",
+        "gwp_basis": "IPCC Second Assessment Report",
+        "uncertainty": "NOT_QUANTIFIED_IN_SOURCE",
+        "transcription_status": "MANUALLY_TRANSCRIBED_OFFICIAL_SOURCE"
+      },
+      "expected_accept": true,
+      "expected_total_tco2e": "11.85120",
+      "reason": "Positive same-year purchased electricity, synthetic input"
+    },
+    {
+      "id": "valid_equivalent_kwh",
+      "activities": [
+        {
+          "activity_id": "synthetic-2024-001",
+          "site_id": "DEMO-SITE",
+          "meter_id": "DEMO-METER",
+          "country": "ZA",
+          "period_start": "2024-01-01",
+          "period_end": "2025-01-01",
+          "quantity": "12345",
+          "unit": "kWh",
+          "source_status": "SYNTHETIC",
+          "source_note": "Invented activity matching official report worked example; not a real customer."
+        }
+      ],
+      "factor": {
+        "factor_id": "ZA_NGGEF_2024_DFFE_2026",
+        "value": "0.960",
+        "unit": "tCO2e/MWh",
+        "country": "ZA",
+        "data_year": 2024,
+        "boundary": "SCOPE2_LOCATION_BASED_PURCHASED_ELECTRICITY",
+        "source_url": "https://www.gov.za/sites/default/files/gcis_document/202609/55353gon7891.pdf",
+        "source_title": "South Africa 2024 Grid Emission Factors Report",
+        "source_locator": "Table 1, printed page 3; Appendix A, printed page 19",
+        "published_on": "2026-09-11",
+        "gwp_basis": "IPCC Second Assessment Report",
+        "uncertainty": "NOT_QUANTIFIED_IN_SOURCE",
+        "transcription_status": "MANUALLY_TRANSCRIBED_OFFICIAL_SOURCE"
+      },
+      "expected_accept": true,
+      "expected_total_tco2e": "11.85120",
+      "reason": "Unit conversion before multiplication"
+    },
+    {
+      "id": "valid_zero",
+      "activities": [
+        {
+          "activity_id": "synthetic-2024-001",
+          "site_id": "DEMO-SITE",
+          "meter_id": "DEMO-METER",
+          "country": "ZA",
+          "period_start": "2024-01-01",
+          "period_end": "2025-01-01",
+          "quantity": "0",
+          "unit": "MWh",
+          "source_status": "SYNTHETIC",
+          "source_note": "Invented activity matching official report worked example; not a real customer."
+        }
+      ],
+      "factor": {
+        "factor_id": "ZA_NGGEF_2024_DFFE_2026",
+        "value": "0.960",
+        "unit": "tCO2e/MWh",
+        "country": "ZA",
+        "data_year": 2024,
+        "boundary": "SCOPE2_LOCATION_BASED_PURCHASED_ELECTRICITY",
+        "source_url": "https://www.gov.za/sites/default/files/gcis_document/202609/55353gon7891.pdf",
+        "source_title": "South Africa 2024 Grid Emission Factors Report",
+        "source_locator": "Table 1, printed page 3; Appendix A, printed page 19",
+        "published_on": "2026-09-11",
+        "gwp_basis": "IPCC Second Assessment Report",
+        "uncertainty": "NOT_QUANTIFIED_IN_SOURCE",
+        "transcription_status": "MANUALLY_TRANSCRIBED_OFFICIAL_SOURCE"
+      },
+      "expected_accept": true,
+      "expected_total_tco2e": "0",
+      "reason": "Zero consumption is valid, not missing data"
+    },
+    {
+      "id": "valid_small_kwh",
+      "activities": [
+        {
+          "activity_id": "synthetic-2024-001",
+          "site_id": "DEMO-SITE",
+          "meter_id": "DEMO-METER",
+          "country": "ZA",
+          "period_start": "2024-01-01",
+          "period_end": "2025-01-01",
+          "quantity": "0.125",
+          "unit": "kWh",
+          "source_status": "SYNTHETIC",
+          "source_note": "Invented activity matching official report worked example; not a real customer."
+        }
+      ],
+      "factor": {
+        "factor_id": "ZA_NGGEF_2024_DFFE_2026",
+        "value": "0.960",
+        "unit": "tCO2e/MWh",
+        "country": "ZA",
+        "data_year": 2024,
+        "boundary": "SCOPE2_LOCATION_BASED_PURCHASED_ELECTRICITY",
+        "source_url": "https://www.gov.za/sites/default/files/gcis_document/202609/55353gon7891.pdf",
+        "source_title": "South Africa 2024 Grid Emission Factors Report",
+        "source_locator": "Table 1, printed page 3; Appendix A, printed page 19",
+        "published_on": "2026-09-11",
+        "gwp_basis": "IPCC Second Assessment Report",
+        "uncertainty": "NOT_QUANTIFIED_IN_SOURCE",
+        "transcription_status": "MANUALLY_TRANSCRIBED_OFFICIAL_SOURCE"
+      },
+      "expected_accept": true,
+      "expected_total_tco2e": "0.000120",
+      "reason": "Small nonnegative energy remains valid"
+    },
+    {
+      "id": "valid_large_mwh",
+      "activities": [
+        {
+          "activity_id": "synthetic-2024-001",
+          "site_id": "DEMO-SITE",
+          "meter_id": "DEMO-METER",
+          "country": "ZA",
+          "period_start": "2024-01-01",
+          "period_end": "2025-01-01",
+          "quantity": "125000",
+          "unit": "MWh",
+          "source_status": "SYNTHETIC",
+          "source_note": "Invented activity matching official report worked example; not a real customer."
+        }
+      ],
+      "factor": {
+        "factor_id": "ZA_NGGEF_2024_DFFE_2026",
+        "value": "0.960",
+        "unit": "tCO2e/MWh",
+        "country": "ZA",
+        "data_year": 2024,
+        "boundary": "SCOPE2_LOCATION_BASED_PURCHASED_ELECTRICITY",
+        "source_url": "https://www.gov.za/sites/default/files/gcis_document/202609/55353gon7891.pdf",
+        "source_title": "South Africa 2024 Grid Emission Factors Report",
+        "source_locator": "Table 1, printed page 3; Appendix A, printed page 19",
+        "published_on": "2026-09-11",
+        "gwp_basis": "IPCC Second Assessment Report",
+        "uncertainty": "NOT_QUANTIFIED_IN_SOURCE",
+        "transcription_status": "MANUALLY_TRANSCRIBED_OFFICIAL_SOURCE"
+      },
+      "expected_accept": true,
+      "expected_total_tco2e": "120000",
+      "reason": "Magnitude alone does not establish invalidity"
+    },
+    {
+      "id": "valid_adjacent_periods",
+      "activities": [
+        {
+          "activity_id": "h1",
+          "site_id": "DEMO-SITE",
+          "meter_id": "DEMO-METER",
+          "country": "ZA",
+          "period_start": "2024-01-01",
+          "period_end": "2024-07-01",
+          "quantity": "20",
+          "unit": "MWh",
+          "source_status": "SYNTHETIC",
+          "source_note": "Invented activity matching official report worked example; not a real customer."
+        },
+        {
+          "activity_id": "h2",
+          "site_id": "DEMO-SITE",
+          "meter_id": "DEMO-METER",
+          "country": "ZA",
+          "period_start": "2024-07-01",
+          "period_end": "2025-01-01",
+          "quantity": "30",
+          "unit": "MWh",
+          "source_status": "SYNTHETIC",
+          "source_note": "Invented activity matching official report worked example; not a real customer."
+        }
+      ],
+      "factor": {
+        "factor_id": "ZA_NGGEF_2024_DFFE_2026",
+        "value": "0.960",
+        "unit": "tCO2e/MWh",
+        "country": "ZA",
+        "data_year": 2024,
+        "boundary": "SCOPE2_LOCATION_BASED_PURCHASED_ELECTRICITY",
+        "source_url": "https://www.gov.za/sites/default/files/gcis_document/202609/55353gon7891.pdf",
+        "source_title": "South Africa 2024 Grid Emission Factors Report",
+        "source_locator": "Table 1, printed page 3; Appendix A, printed page 19",
+        "published_on": "2026-09-11",
+        "gwp_basis": "IPCC Second Assessment Report",
+        "uncertainty": "NOT_QUANTIFIED_IN_SOURCE",
+        "transcription_status": "MANUALLY_TRANSCRIBED_OFFICIAL_SOURCE"
+      },
+      "expected_accept": true,
+      "expected_total_tco2e": "48",
+      "reason": "Adjacent end-exclusive periods do not overlap"
+    },
+    {
+      "id": "valid_distinct_meters",
+      "activities": [
+        {
+          "activity_id": "h3",
+          "site_id": "DEMO-SITE",
+          "meter_id": "METER-A",
+          "country": "ZA",
+          "period_start": "2024-01-01",
+          "period_end": "2025-01-01",
+          "quantity": "2",
+          "unit": "MWh",
+          "source_status": "SYNTHETIC",
+          "source_note": "Invented activity matching official report worked example; not a real customer."
+        },
+        {
+          "activity_id": "h4",
+          "site_id": "DEMO-SITE",
+          "meter_id": "METER-B",
+          "country": "ZA",
+          "period_start": "2024-01-01",
+          "period_end": "2025-01-01",
+          "quantity": "3",
+          "unit": "MWh",
+          "source_status": "SYNTHETIC",
+          "source_note": "Invented activity matching official report worked example; not a real customer."
+        }
+      ],
+      "factor": {
+        "factor_id": "ZA_NGGEF_2024_DFFE_2026",
+        "value": "0.960",
+        "unit": "tCO2e/MWh",
+        "country": "ZA",
+        "data_year": 2024,
+        "boundary": "SCOPE2_LOCATION_BASED_PURCHASED_ELECTRICITY",
+        "source_url": "https://www.gov.za/sites/default/files/gcis_document/202609/55353gon7891.pdf",
+        "source_title": "South Africa 2024 Grid Emission Factors Report",
+        "source_locator": "Table 1, printed page 3; Appendix A, printed page 19",
+        "published_on": "2026-09-11",
+        "gwp_basis": "IPCC Second Assessment Report",
+        "uncertainty": "NOT_QUANTIFIED_IN_SOURCE",
+        "transcription_status": "MANUALLY_TRANSCRIBED_OFFICIAL_SOURCE"
+      },
+      "expected_accept": true,
+      "expected_total_tco2e": "4.8",
+      "reason": "Concurrent records on distinct meters are not duplicates"
+    },
+    {
+      "id": "valid_distinct_sites",
+      "activities": [
+        {
+          "activity_id": "h5",
+          "site_id": "SITE-A",
+          "meter_id": "DEMO-METER",
+          "country": "ZA",
+          "period_start": "2024-01-01",
+          "period_end": "2025-01-01",
+          "quantity": "2",
+          "unit": "MWh",
+          "source_status": "SYNTHETIC",
+          "source_note": "Invented activity matching official report worked example; not a real customer."
+        },
+        {
+          "activity_id": "h6",
+          "site_id": "SITE-B",
+          "meter_id": "DEMO-METER",
+          "country": "ZA",
+          "period_start": "2024-01-01",
+          "period_end": "2025-01-01",
+          "quantity": "3",
+          "unit": "MWh",
+          "source_status": "SYNTHETIC",
+          "source_note": "Invented activity matching official report worked example; not a real customer."
+        }
+      ],
+      "factor": {
+        "factor_id": "ZA_NGGEF_2024_DFFE_2026",
+        "value": "0.960",
+        "unit": "tCO2e/MWh",
+        "country": "ZA",
+        "data_year": 2024,
+        "boundary": "SCOPE2_LOCATION_BASED_PURCHASED_ELECTRICITY",
+        "source_url": "https://www.gov.za/sites/default/files/gcis_document/202609/55353gon7891.pdf",
+        "source_title": "South Africa 2024 Grid Emission Factors Report",
+        "source_locator": "Table 1, printed page 3; Appendix A, printed page 19",
+        "published_on": "2026-09-11",
+        "gwp_basis": "IPCC Second Assessment Report",
+        "uncertainty": "NOT_QUANTIFIED_IN_SOURCE",
+        "transcription_status": "MANUALLY_TRANSCRIBED_OFFICIAL_SOURCE"
+      },
+      "expected_accept": true,
+      "expected_total_tco2e": "4.8",
+      "reason": "Same local meter label on different sites must not collide"
+    },
+    {
+      "id": "invalid_activity_country",
+      "activities": [
+        {
+          "activity_id": "synthetic-2024-001",
+          "site_id": "DEMO-SITE",
+          "meter_id": "DEMO-METER",
+          "country": "KE",
+          "period_start": "2024-01-01",
+          "period_end": "2025-01-01",
+          "quantity": "500",
+          "unit": "MWh",
+          "source_status": "SYNTHETIC",
+          "source_note": "Invented activity matching official report worked example; not a real customer."
+        }
+      ],
+      "factor": {
+        "factor_id": "ZA_NGGEF_2024_DFFE_2026",
+        "value": "0.960",
+        "unit": "tCO2e/MWh",
+        "country": "ZA",
+        "data_year": 2024,
+        "boundary": "SCOPE2_LOCATION_BASED_PURCHASED_ELECTRICITY",
+        "source_url": "https://www.gov.za/sites/default/files/gcis_document/202609/55353gon7891.pdf",
+        "source_title": "South Africa 2024 Grid Emission Factors Report",
+        "source_locator": "Table 1, printed page 3; Appendix A, printed page 19",
+        "published_on": "2026-09-11",
+        "gwp_basis": "IPCC Second Assessment Report",
+        "uncertainty": "NOT_QUANTIFIED_IN_SOURCE",
+        "transcription_status": "MANUALLY_TRANSCRIBED_OFFICIAL_SOURCE"
+      },
+      "expected_accept": false,
+      "expected_total_tco2e": null,
+      "reason": "ZA factor cannot estimate Kenya consumption"
+    },
+    {
+      "id": "invalid_activity_year",
+      "activities": [
+        {
+          "activity_id": "synthetic-2024-001",
+          "site_id": "DEMO-SITE",
+          "meter_id": "DEMO-METER",
+          "country": "ZA",
+          "period_start": "2026-01-01",
+          "period_end": "2027-01-01",
+          "quantity": "500",
+          "unit": "MWh",
+          "source_status": "SYNTHETIC",
+          "source_note": "Invented activity matching official report worked example; not a real customer."
+        }
+      ],
+      "factor": {
+        "factor_id": "ZA_NGGEF_2024_DFFE_2026",
+        "value": "0.960",
+        "unit": "tCO2e/MWh",
+        "country": "ZA",
+        "data_year": 2024,
+        "boundary": "SCOPE2_LOCATION_BASED_PURCHASED_ELECTRICITY",
+        "source_url": "https://www.gov.za/sites/default/files/gcis_document/202609/55353gon7891.pdf",
+        "source_title": "South Africa 2024 Grid Emission Factors Report",
+        "source_locator": "Table 1, printed page 3; Appendix A, printed page 19",
+        "published_on": "2026-09-11",
+        "gwp_basis": "IPCC Second Assessment Report",
+        "uncertainty": "NOT_QUANTIFIED_IN_SOURCE",
+        "transcription_status": "MANUALLY_TRANSCRIBED_OFFICIAL_SOURCE"
+      },
+      "expected_accept": false,
+      "expected_total_tco2e": null,
+      "reason": "Publication year is not factor data year"
+    },
+    {
+      "id": "invalid_cross_year",
+      "activities": [
+        {
+          "activity_id": "synthetic-2024-001",
+          "site_id": "DEMO-SITE",
+          "meter_id": "DEMO-METER",
+          "country": "ZA",
+          "period_start": "2023-12-15",
+          "period_end": "2024-02-01",
+          "quantity": "500",
+          "unit": "MWh",
+          "source_status": "SYNTHETIC",
+          "source_note": "Invented activity matching official report worked example; not a real customer."
+        }
+      ],
+      "factor": {
+        "factor_id": "ZA_NGGEF_2024_DFFE_2026",
+        "value": "0.960",
+        "unit": "tCO2e/MWh",
+        "country": "ZA",
+        "data_year": 2024,
+        "boundary": "SCOPE2_LOCATION_BASED_PURCHASED_ELECTRICITY",
+        "source_url": "https://www.gov.za/sites/default/files/gcis_document/202609/55353gon7891.pdf",
+        "source_title": "South Africa 2024 Grid Emission Factors Report",
+        "source_locator": "Table 1, printed page 3; Appendix A, printed page 19",
+        "published_on": "2026-09-11",
+        "gwp_basis": "IPCC Second Assessment Report",
+        "uncertainty": "NOT_QUANTIFIED_IN_SOURCE",
+        "transcription_status": "MANUALLY_TRANSCRIBED_OFFICIAL_SOURCE"
+      },
+      "expected_accept": false,
+      "expected_total_tco2e": null,
+      "reason": "Single annual factor does not cover prior-year portion"
+    },
+    {
+      "id": "invalid_currency_as_energy",
+      "activities": [
+        {
+          "activity_id": "synthetic-2024-001",
+          "site_id": "DEMO-SITE",
+          "meter_id": "DEMO-METER",
+          "country": "ZA",
+          "period_start": "2024-01-01",
+          "period_end": "2025-01-01",
+          "quantity": "500",
+          "unit": "ZAR",
+          "source_status": "SYNTHETIC",
+          "source_note": "Invented activity matching official report worked example; not a real customer."
+        }
+      ],
+      "factor": {
+        "factor_id": "ZA_NGGEF_2024_DFFE_2026",
+        "value": "0.960",
+        "unit": "tCO2e/MWh",
+        "country": "ZA",
+        "data_year": 2024,
+        "boundary": "SCOPE2_LOCATION_BASED_PURCHASED_ELECTRICITY",
+        "source_url": "https://www.gov.za/sites/default/files/gcis_document/202609/55353gon7891.pdf",
+        "source_title": "South Africa 2024 Grid Emission Factors Report",
+        "source_locator": "Table 1, printed page 3; Appendix A, printed page 19",
+        "published_on": "2026-09-11",
+        "gwp_basis": "IPCC Second Assessment Report",
+        "uncertainty": "NOT_QUANTIFIED_IN_SOURCE",
+        "transcription_status": "MANUALLY_TRANSCRIBED_OFFICIAL_SOURCE"
+      },
+      "expected_accept": false,
+      "expected_total_tco2e": null,
+      "reason": "Money is not electricity activity"
+    },
+    {
+      "id": "invalid_power_as_energy",
+      "activities": [
+        {
+          "activity_id": "synthetic-2024-001",
+          "site_id": "DEMO-SITE",
+          "meter_id": "DEMO-METER",
+          "country": "ZA",
+          "period_start": "2024-01-01",
+          "period_end": "2025-01-01",
+          "quantity": "500",
+          "unit": "kW",
+          "source_status": "SYNTHETIC",
+          "source_note": "Invented activity matching official report worked example; not a real customer."
+        }
+      ],
+      "factor": {
+        "factor_id": "ZA_NGGEF_2024_DFFE_2026",
+        "value": "0.960",
+        "unit": "tCO2e/MWh",
+        "country": "ZA",
+        "data_year": 2024,
+        "boundary": "SCOPE2_LOCATION_BASED_PURCHASED_ELECTRICITY",
+        "source_url": "https://www.gov.za/sites/default/files/gcis_document/202609/55353gon7891.pdf",
+        "source_title": "South Africa 2024 Grid Emission Factors Report",
+        "source_locator": "Table 1, printed page 3; Appendix A, printed page 19",
+        "published_on": "2026-09-11",
+        "gwp_basis": "IPCC Second Assessment Report",
+        "uncertainty": "NOT_QUANTIFIED_IN_SOURCE",
+        "transcription_status": "MANUALLY_TRANSCRIBED_OFFICIAL_SOURCE"
+      },
+      "expected_accept": false,
+      "expected_total_tco2e": null,
+      "reason": "Power is not energy without duration"
+    },
+    {
+      "id": "invalid_negative_energy",
+      "activities": [
+        {
+          "activity_id": "synthetic-2024-001",
+          "site_id": "DEMO-SITE",
+          "meter_id": "DEMO-METER",
+          "country": "ZA",
+          "period_start": "2024-01-01",
+          "period_end": "2025-01-01",
+          "quantity": "-1",
+          "unit": "MWh",
+          "source_status": "SYNTHETIC",
+          "source_note": "Invented activity matching official report worked example; not a real customer."
+        }
+      ],
+      "factor": {
+        "factor_id": "ZA_NGGEF_2024_DFFE_2026",
+        "value": "0.960",
+        "unit": "tCO2e/MWh",
+        "country": "ZA",
+        "data_year": 2024,
+        "boundary": "SCOPE2_LOCATION_BASED_PURCHASED_ELECTRICITY",
+        "source_url": "https://www.gov.za/sites/default/files/gcis_document/202609/55353gon7891.pdf",
+        "source_title": "South Africa 2024 Grid Emission Factors Report",
+        "source_locator": "Table 1, printed page 3; Appendix A, printed page 19",
+        "published_on": "2026-09-11",
+        "gwp_basis": "IPCC Second Assessment Report",
+        "uncertainty": "NOT_QUANTIFIED_IN_SOURCE",
+        "transcription_status": "MANUALLY_TRANSCRIBED_OFFICIAL_SOURCE"
+      },
+      "expected_accept": false,
+      "expected_total_tco2e": null,
+      "reason": "Negative grid consumption unsupported in this accounting boundary"
+    },
+    {
+      "id": "invalid_nonfinite_energy",
+      "activities": [
+        {
+          "activity_id": "synthetic-2024-001",
+          "site_id": "DEMO-SITE",
+          "meter_id": "DEMO-METER",
+          "country": "ZA",
+          "period_start": "2024-01-01",
+          "period_end": "2025-01-01",
+          "quantity": "NaN",
+          "unit": "MWh",
+          "source_status": "SYNTHETIC",
+          "source_note": "Invented activity matching official report worked example; not a real customer."
+        }
+      ],
+      "factor": {
+        "factor_id": "ZA_NGGEF_2024_DFFE_2026",
+        "value": "0.960",
+        "unit": "tCO2e/MWh",
+        "country": "ZA",
+        "data_year": 2024,
+        "boundary": "SCOPE2_LOCATION_BASED_PURCHASED_ELECTRICITY",
+        "source_url": "https://www.gov.za/sites/default/files/gcis_document/202609/55353gon7891.pdf",
+        "source_title": "South Africa 2024 Grid Emission Factors Report",
+        "source_locator": "Table 1, printed page 3; Appendix A, printed page 19",
+        "published_on": "2026-09-11",
+        "gwp_basis": "IPCC Second Assessment Report",
+        "uncertainty": "NOT_QUANTIFIED_IN_SOURCE",
+        "transcription_status": "MANUALLY_TRANSCRIBED_OFFICIAL_SOURCE"
+      },
+      "expected_accept": false,
+      "expected_total_tco2e": null,
+      "reason": "Nonfinite inputs cannot produce estimate"
+    },
+    {
+      "id": "invalid_factor_country",
+      "activities": [
+        {
+          "activity_id": "synthetic-2024-001",
+          "site_id": "DEMO-SITE",
+          "meter_id": "DEMO-METER",
+          "country": "ZA",
+          "period_start": "2024-01-01",
+          "period_end": "2025-01-01",
+          "quantity": "500",
+          "unit": "MWh",
+          "source_status": "SYNTHETIC",
+          "source_note": "Invented activity matching official report worked example; not a real customer."
+        }
+      ],
+      "factor": {
+        "factor_id": "ZA_NGGEF_2024_DFFE_2026",
+        "value": "0.960",
+        "unit": "tCO2e/MWh",
+        "country": "KE",
+        "data_year": 2024,
+        "boundary": "SCOPE2_LOCATION_BASED_PURCHASED_ELECTRICITY",
+        "source_url": "https://www.gov.za/sites/default/files/gcis_document/202609/55353gon7891.pdf",
+        "source_title": "South Africa 2024 Grid Emission Factors Report",
+        "source_locator": "Table 1, printed page 3; Appendix A, printed page 19",
+        "published_on": "2026-09-11",
+        "gwp_basis": "IPCC Second Assessment Report",
+        "uncertainty": "NOT_QUANTIFIED_IN_SOURCE",
+        "transcription_status": "MANUALLY_TRANSCRIBED_OFFICIAL_SOURCE"
+      },
+      "expected_accept": false,
+      "expected_total_tco2e": null,
+      "reason": "Country mismatch"
+    },
+    {
+      "id": "invalid_factor_data_year",
+      "activities": [
+        {
+          "activity_id": "synthetic-2024-001",
+          "site_id": "DEMO-SITE",
+          "meter_id": "DEMO-METER",
+          "country": "ZA",
+          "period_start": "2024-01-01",
+          "period_end": "2025-01-01",
+          "quantity": "500",
+          "unit": "MWh",
+          "source_status": "SYNTHETIC",
+          "source_note": "Invented activity matching official report worked example; not a real customer."
+        }
+      ],
+      "factor": {
+        "factor_id": "ZA_NGGEF_2024_DFFE_2026",
+        "value": "0.960",
+        "unit": "tCO2e/MWh",
+        "country": "ZA",
+        "data_year": 2026,
+        "boundary": "SCOPE2_LOCATION_BASED_PURCHASED_ELECTRICITY",
+        "source_url": "https://www.gov.za/sites/default/files/gcis_document/202609/55353gon7891.pdf",
+        "source_title": "South Africa 2024 Grid Emission Factors Report",
+        "source_locator": "Table 1, printed page 3; Appendix A, printed page 19",
+        "published_on": "2026-09-11",
+        "gwp_basis": "IPCC Second Assessment Report",
+        "uncertainty": "NOT_QUANTIFIED_IN_SOURCE",
+        "transcription_status": "MANUALLY_TRANSCRIBED_OFFICIAL_SOURCE"
+      },
+      "expected_accept": false,
+      "expected_total_tco2e": null,
+      "reason": "Official factor identity/value cited for2024 cannot relabel2026"
+    },
+    {
+      "id": "invalid_factor_unit",
+      "activities": [
+        {
+          "activity_id": "synthetic-2024-001",
+          "site_id": "DEMO-SITE",
+          "meter_id": "DEMO-METER",
+          "country": "ZA",
+          "period_start": "2024-01-01",
+          "period_end": "2025-01-01",
+          "quantity": "500",
+          "unit": "MWh",
+          "source_status": "SYNTHETIC",
+          "source_note": "Invented activity matching official report worked example; not a real customer."
+        }
+      ],
+      "factor": {
+        "factor_id": "ZA_NGGEF_2024_DFFE_2026",
+        "value": "0.960",
+        "unit": "tCO2e/kWh",
+        "country": "ZA",
+        "data_year": 2024,
+        "boundary": "SCOPE2_LOCATION_BASED_PURCHASED_ELECTRICITY",
+        "source_url": "https://www.gov.za/sites/default/files/gcis_document/202609/55353gon7891.pdf",
+        "source_title": "South Africa 2024 Grid Emission Factors Report",
+        "source_locator": "Table 1, printed page 3; Appendix A, printed page 19",
+        "published_on": "2026-09-11",
+        "gwp_basis": "IPCC Second Assessment Report",
+        "uncertainty": "NOT_QUANTIFIED_IN_SOURCE",
+        "transcription_status": "MANUALLY_TRANSCRIBED_OFFICIAL_SOURCE"
+      },
+      "expected_accept": false,
+      "expected_total_tco2e": null,
+      "reason": "Dimension changed while numeric value retained"
+    },
+    {
+      "id": "invalid_factor_generation_boundary",
+      "activities": [
+        {
+          "activity_id": "synthetic-2024-001",
+          "site_id": "DEMO-SITE",
+          "meter_id": "DEMO-METER",
+          "country": "ZA",
+          "period_start": "2024-01-01",
+          "period_end": "2025-01-01",
+          "quantity": "500",
+          "unit": "MWh",
+          "source_status": "SYNTHETIC",
+          "source_note": "Invented activity matching official report worked example; not a real customer."
+        }
+      ],
+      "factor": {
+        "factor_id": "ZA_NGGEF_2024_DFFE_2026",
+        "value": "0.960",
+        "unit": "tCO2e/MWh",
+        "country": "ZA",
+        "data_year": 2024,
+        "boundary": "GENERATION",
+        "source_url": "https://www.gov.za/sites/default/files/gcis_document/202609/55353gon7891.pdf",
+        "source_title": "South Africa 2024 Grid Emission Factors Report",
+        "source_locator": "Table 1, printed page 3; Appendix A, printed page 19",
+        "published_on": "2026-09-11",
+        "gwp_basis": "IPCC Second Assessment Report",
+        "uncertainty": "NOT_QUANTIFIED_IN_SOURCE",
+        "transcription_status": "MANUALLY_TRANSCRIBED_OFFICIAL_SOURCE"
+      },
+      "expected_accept": false,
+      "expected_total_tco2e": null,
+      "reason": "Generation boundary is not purchased Scope2"
+    },
+    {
+      "id": "invalid_factor_value",
+      "activities": [
+        {
+          "activity_id": "synthetic-2024-001",
+          "site_id": "DEMO-SITE",
+          "meter_id": "DEMO-METER",
+          "country": "ZA",
+          "period_start": "2024-01-01",
+          "period_end": "2025-01-01",
+          "quantity": "500",
+          "unit": "MWh",
+          "source_status": "SYNTHETIC",
+          "source_note": "Invented activity matching official report worked example; not a real customer."
+        }
+      ],
+      "factor": {
+        "factor_id": "ZA_NGGEF_2024_DFFE_2026",
+        "value": "0.096",
+        "unit": "tCO2e/MWh",
+        "country": "ZA",
+        "data_year": 2024,
+        "boundary": "SCOPE2_LOCATION_BASED_PURCHASED_ELECTRICITY",
+        "source_url": "https://www.gov.za/sites/default/files/gcis_document/202609/55353gon7891.pdf",
+        "source_title": "South Africa 2024 Grid Emission Factors Report",
+        "source_locator": "Table 1, printed page 3; Appendix A, printed page 19",
+        "published_on": "2026-09-11",
+        "gwp_basis": "IPCC Second Assessment Report",
+        "uncertainty": "NOT_QUANTIFIED_IN_SOURCE",
+        "transcription_status": "MANUALLY_TRANSCRIBED_OFFICIAL_SOURCE"
+      },
+      "expected_accept": false,
+      "expected_total_tco2e": null,
+      "reason": "Tenfold transcription error against fixed cited source"
+    },
+    {
+      "id": "invalid_factor_unproven_source",
+      "activities": [
+        {
+          "activity_id": "synthetic-2024-001",
+          "site_id": "DEMO-SITE",
+          "meter_id": "DEMO-METER",
+          "country": "ZA",
+          "period_start": "2024-01-01",
+          "period_end": "2025-01-01",
+          "quantity": "500",
+          "unit": "MWh",
+          "source_status": "SYNTHETIC",
+          "source_note": "Invented activity matching official report worked example; not a real customer."
+        }
+      ],
+      "factor": {
+        "factor_id": "ZA_NGGEF_2024_DFFE_2026",
+        "value": "0.960",
+        "unit": "tCO2e/MWh",
+        "country": "ZA",
+        "data_year": 2024,
+        "boundary": "SCOPE2_LOCATION_BASED_PURCHASED_ELECTRICITY",
+        "source_url": "https://example.org/not-an-official-factor.pdf",
+        "source_title": "South Africa 2024 Grid Emission Factors Report",
+        "source_locator": "Table 1, printed page 3; Appendix A, printed page 19",
+        "published_on": "2026-09-11",
+        "gwp_basis": "IPCC Second Assessment Report",
+        "uncertainty": "NOT_QUANTIFIED_IN_SOURCE",
+        "transcription_status": "MANUALLY_TRANSCRIBED_OFFICIAL_SOURCE"
+      },
+      "expected_accept": false,
+      "expected_total_tco2e": null,
+      "reason": "Unsupported source cannot inherit official provenance"
+    },
+    {
+      "id": "invalid_claimed_verified_activity",
+      "activities": [
+        {
+          "activity_id": "synthetic-2024-001",
+          "site_id": "DEMO-SITE",
+          "meter_id": "DEMO-METER",
+          "country": "ZA",
+          "period_start": "2024-01-01",
+          "period_end": "2025-01-01",
+          "quantity": "500",
+          "unit": "MWh",
+          "source_status": "VERIFIED",
+          "source_note": "Invented activity matching official report worked example; not a real customer."
+        }
+      ],
+      "factor": {
+        "factor_id": "ZA_NGGEF_2024_DFFE_2026",
+        "value": "0.960",
+        "unit": "tCO2e/MWh",
+        "country": "ZA",
+        "data_year": 2024,
+        "boundary": "SCOPE2_LOCATION_BASED_PURCHASED_ELECTRICITY",
+        "source_url": "https://www.gov.za/sites/default/files/gcis_document/202609/55353gon7891.pdf",
+        "source_title": "South Africa 2024 Grid Emission Factors Report",
+        "source_locator": "Table 1, printed page 3; Appendix A, printed page 19",
+        "published_on": "2026-09-11",
+        "gwp_basis": "IPCC Second Assessment Report",
+        "uncertainty": "NOT_QUANTIFIED_IN_SOURCE",
+        "transcription_status": "MANUALLY_TRANSCRIBED_OFFICIAL_SOURCE"
+      },
+      "expected_accept": false,
+      "expected_total_tco2e": null,
+      "reason": "No independent activity-verification mechanism in this synthetic pilot"
+    },
+    {
+      "id": "invalid_duplicate_activity_id",
+      "activities": [
+        {
+          "activity_id": "dup",
+          "site_id": "DEMO-SITE",
+          "meter_id": "A",
+          "country": "ZA",
+          "period_start": "2024-01-01",
+          "period_end": "2025-01-01",
+          "quantity": "2",
+          "unit": "MWh",
+          "source_status": "SYNTHETIC",
+          "source_note": "Invented activity matching official report worked example; not a real customer."
+        },
+        {
+          "activity_id": "dup",
+          "site_id": "DEMO-SITE",
+          "meter_id": "B",
+          "country": "ZA",
+          "period_start": "2024-01-01",
+          "period_end": "2025-01-01",
+          "quantity": "3",
+          "unit": "MWh",
+          "source_status": "SYNTHETIC",
+          "source_note": "Invented activity matching official report worked example; not a real customer."
+        }
+      ],
+      "factor": {
+        "factor_id": "ZA_NGGEF_2024_DFFE_2026",
+        "value": "0.960",
+        "unit": "tCO2e/MWh",
+        "country": "ZA",
+        "data_year": 2024,
+        "boundary": "SCOPE2_LOCATION_BASED_PURCHASED_ELECTRICITY",
+        "source_url": "https://www.gov.za/sites/default/files/gcis_document/202609/55353gon7891.pdf",
+        "source_title": "South Africa 2024 Grid Emission Factors Report",
+        "source_locator": "Table 1, printed page 3; Appendix A, printed page 19",
+        "published_on": "2026-09-11",
+        "gwp_basis": "IPCC Second Assessment Report",
+        "uncertainty": "NOT_QUANTIFIED_IN_SOURCE",
+        "transcription_status": "MANUALLY_TRANSCRIBED_OFFICIAL_SOURCE"
+      },
+      "expected_accept": false,
+      "expected_total_tco2e": null,
+      "reason": "Duplicate activity identifier cannot be treated as distinct input"
+    },
+    {
+      "id": "invalid_same_meter_overlap",
+      "activities": [
+        {
+          "activity_id": "o1",
+          "site_id": "DEMO-SITE",
+          "meter_id": "DEMO-METER",
+          "country": "ZA",
+          "period_start": "2024-01-01",
+          "period_end": "2024-08-01",
+          "quantity": "20",
+          "unit": "MWh",
+          "source_status": "SYNTHETIC",
+          "source_note": "Invented activity matching official report worked example; not a real customer."
+        },
+        {
+          "activity_id": "o2",
+          "site_id": "DEMO-SITE",
+          "meter_id": "DEMO-METER",
+          "country": "ZA",
+          "period_start": "2024-07-01",
+          "period_end": "2025-01-01",
+          "quantity": "30",
+          "unit": "MWh",
+          "source_status": "SYNTHETIC",
+          "source_note": "Invented activity matching official report worked example; not a real customer."
+        }
+      ],
+      "factor": {
+        "factor_id": "ZA_NGGEF_2024_DFFE_2026",
+        "value": "0.960",
+        "unit": "tCO2e/MWh",
+        "country": "ZA",
+        "data_year": 2024,
+        "boundary": "SCOPE2_LOCATION_BASED_PURCHASED_ELECTRICITY",
+        "source_url": "https://www.gov.za/sites/default/files/gcis_document/202609/55353gon7891.pdf",
+        "source_title": "South Africa 2024 Grid Emission Factors Report",
+        "source_locator": "Table 1, printed page 3; Appendix A, printed page 19",
+        "published_on": "2026-09-11",
+        "gwp_basis": "IPCC Second Assessment Report",
+        "uncertainty": "NOT_QUANTIFIED_IN_SOURCE",
+        "transcription_status": "MANUALLY_TRANSCRIBED_OFFICIAL_SOURCE"
+      },
+      "expected_accept": false,
+      "expected_total_tco2e": null,
+      "reason": "Overlapping meter intervals risk double counting"
+    }
+  ]
+}

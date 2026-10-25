@@ -1,0 +1,403 @@
+{
+  "invoices": [
+    {
+      "invoice_number": "INVENTED-1-7",
+      "site_id": "DUR-WH-01",
+      "meter_id": "SYNTH-METER-1",
+      "country": "ZA",
+      "utility": "EXAMPLE_CITY_NOT_REAL",
+      "currency": "ZAR",
+      "tariff_id": "DEMO-TOU-ZA-01",
+      "period_start": "2026-07-01",
+      "period_end": "2026-08-01",
+      "quantities": {
+        "kwh_peak": 400,
+        "kwh_standard": 820,
+        "kwh_offpeak": 620,
+        "demand_kva": 55,
+        "kwh_total": 1840
+      },
+      "billed_lines": [
+        {
+          "code": "energy_peak",
+          "amount": "1460.00"
+        },
+        {
+          "code": "energy_standard",
+          "amount": "1590.80"
+        },
+        {
+          "code": "energy_offpeak",
+          "amount": "663.40"
+        },
+        {
+          "code": "network_energy",
+          "amount": "570.40"
+        },
+        {
+          "code": "capacity",
+          "amount": "5555.00"
+        },
+        {
+          "code": "service",
+          "amount": "589.00"
+        },
+        {
+          "code": "tax",
+          "amount": "1564.29"
+        }
+      ],
+      "billed_total": "11992.89",
+      "source": "SYNTHETIC_ONLY",
+      "billing_month": "2026-07"
+    },
+    {
+      "invoice_number": "INVENTED-1-8",
+      "site_id": "DUR-WH-01",
+      "meter_id": "SYNTH-METER-1",
+      "country": "ZA",
+      "utility": "EXAMPLE_CITY_NOT_REAL",
+      "currency": "ZAR",
+      "tariff_id": "DEMO-TOU-ZA-01",
+      "period_start": "2026-08-01",
+      "period_end": "2026-09-01",
+      "quantities": {
+        "kwh_peak": 600,
+        "kwh_standard": 1230,
+        "kwh_offpeak": 930,
+        "demand_kva": 55,
+        "kwh_total": 2760
+      },
+      "billed_lines": [
+        {
+          "code": "energy_peak",
+          "amount": "2190.00"
+        },
+        {
+          "code": "energy_standard",
+          "amount": "2386.20"
+        },
+        {
+          "code": "energy_offpeak",
+          "amount": "995.10"
+        },
+        {
+          "code": "network_energy",
+          "amount": "855.60"
+        },
+        {
+          "code": "capacity",
+          "amount": "5555.00"
+        },
+        {
+          "code": "service",
+          "amount": "589.00"
+        },
+        {
+          "code": "tax",
+          "amount": "1885.64"
+        }
+      ],
+      "billed_total": "14456.54",
+      "source": "SYNTHETIC_ONLY",
+      "billing_month": "2026-08"
+    },
+    {
+      "invoice_number": "INVENTED-1-9",
+      "site_id": "DUR-WH-01",
+      "meter_id": "SYNTH-METER-1",
+      "country": "ZA",
+      "utility": "EXAMPLE_CITY_NOT_REAL",
+      "currency": "ZAR",
+      "tariff_id": "DEMO-TOU-ZA-01",
+      "period_start": "2026-09-01",
+      "period_end": "2026-10-01",
+      "quantities": {
+        "kwh_peak": 800,
+        "kwh_standard": 1640,
+        "kwh_offpeak": 1240,
+        "demand_kva": 55,
+        "kwh_total": 3680
+      },
+      "billed_lines": [
+        {
+          "code": "energy_peak",
+          "amount": "3190.00"
+        },
+        {
+          "code": "energy_standard",
+          "amount": "3181.60"
+        },
+        {
+          "code": "energy_offpeak",
+          "amount": "1326.80"
+        },
+        {
+          "code": "network_energy",
+          "amount": "1140.80"
+        },
+        {
+          "code": "capacity",
+          "amount": "5555.00"
+        },
+        {
+          "code": "service",
+          "amount": "570.00"
+        },
+        {
+          "code": "tax",
+          "amount": "2204.13"
+        }
+      ],
+      "billed_total": "17168.33",
+      "source": "SYNTHETIC_ONLY",
+      "billing_month": "2026-09"
+    },
+    {
+      "invoice_number": "INVENTED-2-7",
+      "site_id": "JHB-COLD-02",
+      "meter_id": "SYNTH-METER-2",
+      "country": "ZA",
+      "utility": "EXAMPLE_CITY_NOT_REAL",
+      "currency": "ZAR",
+      "tariff_id": "DEMO-TOU-ZA-01",
+      "period_start": "2026-07-01",
+      "period_end": "2026-08-01",
+      "quantities": {
+        "kwh_peak": 800,
+        "kwh_standard": 1640,
+        "kwh_offpeak": 1240,
+        "demand_kva": 75,
+        "kwh_total": 3680
+      },
+      "billed_lines": [
+        {
+          "code": "energy_peak",
+          "amount": "2920.00"
+        },
+        {
+          "code": "energy_standard",
+          "amount": "3181.60"
+        },
+        {
+          "code": "energy_offpeak",
+          "amount": "1326.80"
+        },
+        {
+          "code": "network_energy",
+          "amount": "1140.80"
+        },
+        {
+          "code": "capacity",
+          "amount": "7575.00"
+        },
+        {
+          "code": "service",
+          "amount": "589.00"
+        },
+        {
+          "code": "tax",
+          "amount": "2509.98"
+        }
+      ],
+      "billed_total": "19243.18",
+      "source": "SYNTHETIC_ONLY",
+      "billing_month": "2026-07"
+    },
+    {
+      "invoice_number": "INVENTED-2-8",
+      "site_id": "JHB-COLD-02",
+      "meter_id": "SYNTH-METER-2",
+      "country": "ZA",
+      "utility": "EXAMPLE_CITY_NOT_REAL",
+      "currency": "ZAR",
+      "tariff_id": "DEMO-TOU-ZA-01",
+      "period_start": "2026-08-01",
+      "period_end": "2026-09-01",
+      "quantities": {
+        "kwh_peak": 1200,
+        "kwh_standard": 2460,
+        "kwh_offpeak": 1860,
+        "demand_kva": 75,
+        "kwh_total": 5520
+      },
+      "billed_lines": [
+        {
+          "code": "energy_peak",
+          "amount": "4380.00"
+        },
+        {
+          "code": "energy_standard",
+          "amount": "4772.40"
+        },
+        {
+          "code": "energy_offpeak",
+          "amount": "1990.20"
+        },
+        {
+          "code": "network_energy",
+          "amount": "1711.20"
+        },
+        {
+          "code": "capacity",
+          "amount": "7575.00"
+        },
+        {
+          "code": "service",
+          "amount": "639.00"
+        },
+        {
+          "code": "tax",
+          "amount": "3152.67"
+        }
+      ],
+      "billed_total": "24220.47",
+      "source": "SYNTHETIC_ONLY",
+      "billing_month": "2026-08"
+    },
+    {
+      "invoice_number": "INVENTED-2-9",
+      "site_id": "JHB-COLD-02",
+      "meter_id": "SYNTH-METER-2",
+      "country": "ZA",
+      "utility": "EXAMPLE_CITY_NOT_REAL",
+      "currency": "ZAR",
+      "tariff_id": "DEMO-TOU-ZA-01",
+      "period_start": "2026-09-01",
+      "period_end": "2026-10-01",
+      "quantities": {
+        "kwh_peak": 1600,
+        "kwh_standard": 3280,
+        "kwh_offpeak": 2480,
+        "demand_kva": 75,
+        "kwh_total": 7360
+      },
+      "billed_lines": [
+        {
+          "code": "energy_peak",
+          "amount": "5840.00"
+        },
+        {
+          "code": "energy_standard",
+          "amount": "6363.20"
+        },
+        {
+          "code": "energy_offpeak",
+          "amount": "2653.60"
+        },
+        {
+          "code": "network_energy",
+          "amount": "2281.60"
+        },
+        {
+          "code": "capacity",
+          "amount": "7575.00"
+        },
+        {
+          "code": "service",
+          "amount": "570.00"
+        },
+        {
+          "code": "tax",
+          "amount": "3792.51"
+        }
+      ],
+      "billed_total": "29075.91",
+      "source": "SYNTHETIC_ONLY",
+      "billing_month": "2026-09"
+    },
+    {
+      "invoice_number": "INVENTED-3-7",
+      "site_id": "NAIROBI-EX-01",
+      "meter_id": "SYNTH-METER-3",
+      "country": "KE",
+      "utility": "EXAMPLE_KEN_NOT_REAL",
+      "currency": "KES",
+      "tariff_id": "DEMO-FLAT-KEN-01",
+      "period_start": "2026-07-01",
+      "period_end": "2026-08-01",
+      "quantities": {
+        "kwh_total": 2400
+      },
+      "billed_lines": [
+        {
+          "code": "energy",
+          "amount": "43200.00"
+        },
+        {
+          "code": "service",
+          "amount": "1085.00"
+        },
+        {
+          "code": "tax",
+          "amount": "4428.50"
+        }
+      ],
+      "billed_total": "48713.50",
+      "source": "SYNTHETIC_ONLY",
+      "billing_month": "2026-07"
+    },
+    {
+      "invoice_number": "INVENTED-3-8",
+      "site_id": "NAIROBI-EX-01",
+      "meter_id": "SYNTH-METER-3",
+      "country": "KE",
+      "utility": "EXAMPLE_KEN_NOT_REAL",
+      "currency": "KES",
+      "tariff_id": "DEMO-FLAT-KEN-01",
+      "period_start": "2026-08-01",
+      "period_end": "2026-09-01",
+      "quantities": {
+        "kwh_total": 2900
+      },
+      "billed_lines": [
+        {
+          "code": "energy",
+          "amount": "52200.00"
+        },
+        {
+          "code": "service",
+          "amount": "1085.00"
+        },
+        {
+          "code": "tax",
+          "amount": "5328.50"
+        }
+      ],
+      "billed_total": "58613.50",
+      "source": "SYNTHETIC_ONLY",
+      "billing_month": "2026-08"
+    },
+    {
+      "invoice_number": "INVENTED-3-9",
+      "site_id": "NAIROBI-EX-01",
+      "meter_id": "SYNTH-METER-3",
+      "country": "KE",
+      "utility": "EXAMPLE_KEN_NOT_REAL",
+      "currency": "KES",
+      "tariff_id": "DEMO-FLAT-KEN-01",
+      "period_start": "2026-09-01",
+      "period_end": "2026-10-01",
+      "quantities": {
+        "kwh_total": 3400
+      },
+      "billed_lines": [
+        {
+          "code": "energy",
+          "amount": "61200.00"
+        },
+        {
+          "code": "service",
+          "amount": "1050.00"
+        },
+        {
+          "code": "tax",
+          "amount": "6225.00"
+        }
+      ],
+      "billed_total": "68475.00",
+      "source": "SYNTHETIC_ONLY",
+      "billing_month": "2026-09"
+    }
+  ]
+}

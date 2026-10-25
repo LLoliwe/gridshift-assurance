@@ -1,0 +1,15 @@
+{
+  "factor_id": "ZA_NGGEF_2024_DFFE_2026",
+  "value": "0.960",
+  "unit": "tCO2e/MWh",
+  "country": "ZA",
+  "data_year": 2024,
+  "boundary": "SCOPE2_LOCATION_BASED_PURCHASED_ELECTRICITY",
+  "source_url": "https://www.gov.za/sites/default/files/gcis_document/202609/55353gon7891.pdf",
+  "source_title": "South Africa 2024 Grid Emission Factors Report",
+  "source_locator": "Table 1, printed page 3; Appendix A, printed page 19",
+  "published_on": "2026-09-11",
+  "gwp_basis": "IPCC Second Assessment Report",
+  "uncertainty": "NOT_QUANTIFIED_IN_SOURCE",
+  "transcription_status": "MANUALLY_TRANSCRIBED_OFFICIAL_SOURCE"
+}

@@ -1,0 +1,478 @@
+{
+  "run_utc": "2026-10-25T05:43:34.468997+00:00",
+  "manifest_sha256": "8dfaeb4fd25f66c6e20b44eb7cfd313a03f727f57de0c99ca6c22d4fc4ea869a",
+  "implementation_sha256": "82f8e3e9a99f6fa354fa3be097d764e475159ff8bbd3c300733a1215e0a85655",
+  "summary": {
+    "simple_arithmetic_baseline": {
+      "valid_cases": 8,
+      "valid_arithmetic_correct": 8,
+      "false_rejects": 0,
+      "invalid_cases": 16,
+      "unsafe_acceptances": 12,
+      "correct_rejections": 4
+    },
+    "gridshift": {
+      "valid_cases": 8,
+      "valid_arithmetic_correct": 8,
+      "false_rejects": 0,
+      "invalid_cases": 16,
+      "unsafe_acceptances": 0,
+      "correct_rejections": 16
+    }
+  },
+  "rows": [
+    {
+      "id": "valid_fractional_mwh",
+      "expected_accept": true,
+      "expected_total_tco2e": "11.85120",
+      "reason": "Positive same-year purchased electricity, synthetic input",
+      "simple_arithmetic_baseline": {
+        "accepted": true,
+        "value": "11.851200",
+        "decision_correct": true,
+        "arithmetic_correct": true
+      },
+      "gridshift": {
+        "accepted": true,
+        "value": "11.8512",
+        "decision_correct": true,
+        "arithmetic_correct": true
+      }
+    },
+    {
+      "id": "valid_equivalent_kwh",
+      "expected_accept": true,
+      "expected_total_tco2e": "11.85120",
+      "reason": "Unit conversion before multiplication",
+      "simple_arithmetic_baseline": {
+        "accepted": true,
+        "value": "11.851200",
+        "decision_correct": true,
+        "arithmetic_correct": true
+      },
+      "gridshift": {
+        "accepted": true,
+        "value": "11.8512",
+        "decision_correct": true,
+        "arithmetic_correct": true
+      }
+    },
+    {
+      "id": "valid_zero",
+      "expected_accept": true,
+      "expected_total_tco2e": "0",
+      "reason": "Zero consumption is valid, not missing data",
+      "simple_arithmetic_baseline": {
+        "accepted": true,
+        "value": "0.000",
+        "decision_correct": true,
+        "arithmetic_correct": true
+      },
+      "gridshift": {
+        "accepted": true,
+        "value": "0",
+        "decision_correct": true,
+        "arithmetic_correct": true
+      }
+    },
+    {
+      "id": "valid_small_kwh",
+      "expected_accept": true,
+      "expected_total_tco2e": "0.000120",
+      "reason": "Small nonnegative energy remains valid",
+      "simple_arithmetic_baseline": {
+        "accepted": true,
+        "value": "0.000120000",
+        "decision_correct": true,
+        "arithmetic_correct": true
+      },
+      "gridshift": {
+        "accepted": true,
+        "value": "0.00012",
+        "decision_correct": true,
+        "arithmetic_correct": true
+      }
+    },
+    {
+      "id": "valid_large_mwh",
+      "expected_accept": true,
+      "expected_total_tco2e": "120000",
+      "reason": "Magnitude alone does not establish invalidity",
+      "simple_arithmetic_baseline": {
+        "accepted": true,
+        "value": "120000.000",
+        "decision_correct": true,
+        "arithmetic_correct": true
+      },
+      "gridshift": {
+        "accepted": true,
+        "value": "120000",
+        "decision_correct": true,
+        "arithmetic_correct": true
+      }
+    },
+    {
+      "id": "valid_adjacent_periods",
+      "expected_accept": true,
+      "expected_total_tco2e": "48",
+      "reason": "Adjacent end-exclusive periods do not overlap",
+      "simple_arithmetic_baseline": {
+        "accepted": true,
+        "value": "48.000",
+        "decision_correct": true,
+        "arithmetic_correct": true
+      },
+      "gridshift": {
+        "accepted": true,
+        "value": "48",
+        "decision_correct": true,
+        "arithmetic_correct": true
+      }
+    },
+    {
+      "id": "valid_distinct_meters",
+      "expected_accept": true,
+      "expected_total_tco2e": "4.8",
+      "reason": "Concurrent records on distinct meters are not duplicates",
+      "simple_arithmetic_baseline": {
+        "accepted": true,
+        "value": "4.800",
+        "decision_correct": true,
+        "arithmetic_correct": true
+      },
+      "gridshift": {
+        "accepted": true,
+        "value": "4.8",
+        "decision_correct": true,
+        "arithmetic_correct": true
+      }
+    },
+    {
+      "id": "valid_distinct_sites",
+      "expected_accept": true,
+      "expected_total_tco2e": "4.8",
+      "reason": "Same local meter label on different sites must not collide",
+      "simple_arithmetic_baseline": {
+        "accepted": true,
+        "value": "4.800",
+        "decision_correct": true,
+        "arithmetic_correct": true
+      },
+      "gridshift": {
+        "accepted": true,
+        "value": "4.8",
+        "decision_correct": true,
+        "arithmetic_correct": true
+      }
+    },
+    {
+      "id": "invalid_activity_country",
+      "expected_accept": false,
+      "expected_total_tco2e": null,
+      "reason": "ZA factor cannot estimate Kenya consumption",
+      "simple_arithmetic_baseline": {
+        "accepted": true,
+        "value": "480.000",
+        "decision_correct": false,
+        "arithmetic_correct": null
+      },
+      "gridshift": {
+        "accepted": false,
+        "error_type": "ValueError",
+        "error": "country mismatch: prototype supports South Africa only",
+        "decision_correct": true,
+        "arithmetic_correct": null
+      }
+    },
+    {
+      "id": "invalid_activity_year",
+      "expected_accept": false,
+      "expected_total_tco2e": null,
+      "reason": "Publication year is not factor data year",
+      "simple_arithmetic_baseline": {
+        "accepted": true,
+        "value": "480.000",
+        "decision_correct": false,
+        "arithmetic_correct": null
+      },
+      "gridshift": {
+        "accepted": false,
+        "error_type": "ValueError",
+        "error": "FACTOR_YEAR_MISMATCH: split periods or supply a matching-year factor; no automatic proxy",
+        "decision_correct": true,
+        "arithmetic_correct": null
+      }
+    },
+    {
+      "id": "invalid_cross_year",
+      "expected_accept": false,
+      "expected_total_tco2e": null,
+      "reason": "Single annual factor does not cover prior-year portion",
+      "simple_arithmetic_baseline": {
+        "accepted": true,
+        "value": "480.000",
+        "decision_correct": false,
+        "arithmetic_correct": null
+      },
+      "gridshift": {
+        "accepted": false,
+        "error_type": "ValueError",
+        "error": "FACTOR_YEAR_MISMATCH: split periods or supply a matching-year factor; no automatic proxy",
+        "decision_correct": true,
+        "arithmetic_correct": null
+      }
+    },
+    {
+      "id": "invalid_currency_as_energy",
+      "expected_accept": false,
+      "expected_total_tco2e": null,
+      "reason": "Money is not electricity activity",
+      "simple_arithmetic_baseline": {
+        "accepted": false,
+        "error_type": "ValueError",
+        "error": "unsupported energy unit",
+        "decision_correct": true,
+        "arithmetic_correct": null
+      },
+      "gridshift": {
+        "accepted": false,
+        "error_type": "ValueError",
+        "error": "activity unit must be kWh or MWh; currency/power are not energy",
+        "decision_correct": true,
+        "arithmetic_correct": null
+      }
+    },
+    {
+      "id": "invalid_power_as_energy",
+      "expected_accept": false,
+      "expected_total_tco2e": null,
+      "reason": "Power is not energy without duration",
+      "simple_arithmetic_baseline": {
+        "accepted": false,
+        "error_type": "ValueError",
+        "error": "unsupported energy unit",
+        "decision_correct": true,
+        "arithmetic_correct": null
+      },
+      "gridshift": {
+        "accepted": false,
+        "error_type": "ValueError",
+        "error": "activity unit must be kWh or MWh; currency/power are not energy",
+        "decision_correct": true,
+        "arithmetic_correct": null
+      }
+    },
+    {
+      "id": "invalid_negative_energy",
+      "expected_accept": false,
+      "expected_total_tco2e": null,
+      "reason": "Negative grid consumption unsupported in this accounting boundary",
+      "simple_arithmetic_baseline": {
+        "accepted": false,
+        "error_type": "ValueError",
+        "error": "invalid numeric activity",
+        "decision_correct": true,
+        "arithmetic_correct": null
+      },
+      "gridshift": {
+        "accepted": false,
+        "error_type": "ValueError",
+        "error": "quantity/value: finite nonnegative decimal with at most 24 digits and exponent magnitude 24 required",
+        "decision_correct": true,
+        "arithmetic_correct": null
+      }
+    },
+    {
+      "id": "invalid_nonfinite_energy",
+      "expected_accept": false,
+      "expected_total_tco2e": null,
+      "reason": "Nonfinite inputs cannot produce estimate",
+      "simple_arithmetic_baseline": {
+        "accepted": false,
+        "error_type": "ValueError",
+        "error": "invalid numeric activity",
+        "decision_correct": true,
+        "arithmetic_correct": null
+      },
+      "gridshift": {
+        "accepted": false,
+        "error_type": "ValueError",
+        "error": "quantity/value: finite nonnegative decimal with at most 24 digits and exponent magnitude 24 required",
+        "decision_correct": true,
+        "arithmetic_correct": null
+      }
+    },
+    {
+      "id": "invalid_factor_country",
+      "expected_accept": false,
+      "expected_total_tco2e": null,
+      "reason": "Country mismatch",
+      "simple_arithmetic_baseline": {
+        "accepted": true,
+        "value": "480.000",
+        "decision_correct": false,
+        "arithmetic_correct": null
+      },
+      "gridshift": {
+        "accepted": false,
+        "error_type": "ValueError",
+        "error": "country mismatch: prototype supports South Africa only",
+        "decision_correct": true,
+        "arithmetic_correct": null
+      }
+    },
+    {
+      "id": "invalid_factor_data_year",
+      "expected_accept": false,
+      "expected_total_tco2e": null,
+      "reason": "Official factor identity/value cited for2024 cannot relabel2026",
+      "simple_arithmetic_baseline": {
+        "accepted": true,
+        "value": "480.000",
+        "decision_correct": false,
+        "arithmetic_correct": null
+      },
+      "gridshift": {
+        "accepted": false,
+        "error_type": "ValueError",
+        "error": "UNRECOGNIZED_FACTOR: only exact curated ZA 2024 NGGEF provenance is supported",
+        "decision_correct": true,
+        "arithmetic_correct": null
+      }
+    },
+    {
+      "id": "invalid_factor_unit",
+      "expected_accept": false,
+      "expected_total_tco2e": null,
+      "reason": "Dimension changed while numeric value retained",
+      "simple_arithmetic_baseline": {
+        "accepted": true,
+        "value": "480.000",
+        "decision_correct": false,
+        "arithmetic_correct": null
+      },
+      "gridshift": {
+        "accepted": false,
+        "error_type": "ValueError",
+        "error": "factor boundary/unit not supported for Scope 2 location-based estimate",
+        "decision_correct": true,
+        "arithmetic_correct": null
+      }
+    },
+    {
+      "id": "invalid_factor_generation_boundary",
+      "expected_accept": false,
+      "expected_total_tco2e": null,
+      "reason": "Generation boundary is not purchased Scope2",
+      "simple_arithmetic_baseline": {
+        "accepted": true,
+        "value": "480.000",
+        "decision_correct": false,
+        "arithmetic_correct": null
+      },
+      "gridshift": {
+        "accepted": false,
+        "error_type": "ValueError",
+        "error": "factor boundary/unit not supported for Scope 2 location-based estimate",
+        "decision_correct": true,
+        "arithmetic_correct": null
+      }
+    },
+    {
+      "id": "invalid_factor_value",
+      "expected_accept": false,
+      "expected_total_tco2e": null,
+      "reason": "Tenfold transcription error against fixed cited source",
+      "simple_arithmetic_baseline": {
+        "accepted": true,
+        "value": "48.000",
+        "decision_correct": false,
+        "arithmetic_correct": null
+      },
+      "gridshift": {
+        "accepted": false,
+        "error_type": "ValueError",
+        "error": "UNRECOGNIZED_FACTOR: only exact curated ZA 2024 NGGEF provenance is supported",
+        "decision_correct": true,
+        "arithmetic_correct": null
+      }
+    },
+    {
+      "id": "invalid_factor_unproven_source",
+      "expected_accept": false,
+      "expected_total_tco2e": null,
+      "reason": "Unsupported source cannot inherit official provenance",
+      "simple_arithmetic_baseline": {
+        "accepted": true,
+        "value": "480.000",
+        "decision_correct": false,
+        "arithmetic_correct": null
+      },
+      "gridshift": {
+        "accepted": false,
+        "error_type": "ValueError",
+        "error": "UNRECOGNIZED_FACTOR: only exact curated ZA 2024 NGGEF provenance is supported",
+        "decision_correct": true,
+        "arithmetic_correct": null
+      }
+    },
+    {
+      "id": "invalid_claimed_verified_activity",
+      "expected_accept": false,
+      "expected_total_tco2e": null,
+      "reason": "No independent activity-verification mechanism in this synthetic pilot",
+      "simple_arithmetic_baseline": {
+        "accepted": true,
+        "value": "480.000",
+        "decision_correct": false,
+        "arithmetic_correct": null
+      },
+      "gridshift": {
+        "accepted": false,
+        "error_type": "ValueError",
+        "error": "activity must remain explicitly synthetic or unverified",
+        "decision_correct": true,
+        "arithmetic_correct": null
+      }
+    },
+    {
+      "id": "invalid_duplicate_activity_id",
+      "expected_accept": false,
+      "expected_total_tco2e": null,
+      "reason": "Duplicate activity identifier cannot be treated as distinct input",
+      "simple_arithmetic_baseline": {
+        "accepted": true,
+        "value": "4.800",
+        "decision_correct": false,
+        "arithmetic_correct": null
+      },
+      "gridshift": {
+        "accepted": false,
+        "error_type": "ValueError",
+        "error": "duplicate activity ID",
+        "decision_correct": true,
+        "arithmetic_correct": null
+      }
+    },
+    {
+      "id": "invalid_same_meter_overlap",
+      "expected_accept": false,
+      "expected_total_tco2e": null,
+      "reason": "Overlapping meter intervals risk double counting",
+      "simple_arithmetic_baseline": {
+        "accepted": true,
+        "value": "48.000",
+        "decision_correct": false,
+        "arithmetic_correct": null
+      },
+      "gridshift": {
+        "accepted": false,
+        "error_type": "ValueError",
+        "error": "overlapping meter intervals would double-count energy",
+        "decision_correct": true,
+        "arithmetic_correct": null
+      }
+    }
+  ],
+  "limitations": "Not random, field data, representative accuracy or competitive product comparison. Author has not read emissions implementation or test internals. Fixtures, function signatures and public review only used. Simple numeric multiplication baseline: normalizes recognized kWh/MWh, rejects negative/nonfinite quantities or factors, but ignores country/year/factor provenance/boundary/dedup/overlap. Not a claim about all spreadsheets or products."
+}

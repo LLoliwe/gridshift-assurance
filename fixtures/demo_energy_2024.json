@@ -1,0 +1,16 @@
+{
+  "activities": [
+    {
+      "activity_id": "synthetic-2024-001",
+      "site_id": "DEMO-SITE",
+      "meter_id": "DEMO-METER",
+      "country": "ZA",
+      "period_start": "2024-01-01",
+      "period_end": "2025-01-01",
+      "quantity": "500",
+      "unit": "MWh",
+      "source_status": "SYNTHETIC",
+      "source_note": "Invented activity matching official report worked example; not a real customer."
+    }
+  ]
+}

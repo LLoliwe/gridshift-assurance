@@ -1,0 +1,224 @@
+{
+  "run_utc": "2026-10-25T05:43:34.494828+00:00",
+  "manifest_sha256": "8dfaeb4fd25f66c6e20b44eb7cfd313a03f727f57de0c99ca6c22d4fc4ea869a",
+  "protocol_sha256": "23fff3b8017f006e6c7abd1a2d01164a23e9d96b684814cd000bf64c699a73b4",
+  "baseline_source_sha256": "dca6a3e394f57618a78a2d43a4341e57afd02e44082bad970ad55001a88310af",
+  "summary": {
+    "valid_cases": 8,
+    "valid_arithmetic_correct": 8,
+    "false_rejects": 0,
+    "invalid_cases": 16,
+    "unsafe_acceptances": 0,
+    "correct_rejections": 16
+  },
+  "rows": [
+    {
+      "accepted": true,
+      "value": "11.851200",
+      "id": "valid_fractional_mwh",
+      "expected_accept": true,
+      "decision_correct": true,
+      "arithmetic_correct": true
+    },
+    {
+      "accepted": true,
+      "value": "11.851200",
+      "id": "valid_equivalent_kwh",
+      "expected_accept": true,
+      "decision_correct": true,
+      "arithmetic_correct": true
+    },
+    {
+      "accepted": true,
+      "value": "0.000",
+      "id": "valid_zero",
+      "expected_accept": true,
+      "decision_correct": true,
+      "arithmetic_correct": true
+    },
+    {
+      "accepted": true,
+      "value": "0.000120000",
+      "id": "valid_small_kwh",
+      "expected_accept": true,
+      "decision_correct": true,
+      "arithmetic_correct": true
+    },
+    {
+      "accepted": true,
+      "value": "120000.000",
+      "id": "valid_large_mwh",
+      "expected_accept": true,
+      "decision_correct": true,
+      "arithmetic_correct": true
+    },
+    {
+      "accepted": true,
+      "value": "48.000",
+      "id": "valid_adjacent_periods",
+      "expected_accept": true,
+      "decision_correct": true,
+      "arithmetic_correct": true
+    },
+    {
+      "accepted": true,
+      "value": "4.800",
+      "id": "valid_distinct_meters",
+      "expected_accept": true,
+      "decision_correct": true,
+      "arithmetic_correct": true
+    },
+    {
+      "accepted": true,
+      "value": "4.800",
+      "id": "valid_distinct_sites",
+      "expected_accept": true,
+      "decision_correct": true,
+      "arithmetic_correct": true
+    },
+    {
+      "accepted": false,
+      "error_type": "ValueError",
+      "error": "country mismatch",
+      "id": "invalid_activity_country",
+      "expected_accept": false,
+      "decision_correct": true,
+      "arithmetic_correct": null
+    },
+    {
+      "accepted": false,
+      "error_type": "ValueError",
+      "error": "invalid interval for factor data year",
+      "id": "invalid_activity_year",
+      "expected_accept": false,
+      "decision_correct": true,
+      "arithmetic_correct": null
+    },
+    {
+      "accepted": false,
+      "error_type": "ValueError",
+      "error": "invalid interval for factor data year",
+      "id": "invalid_cross_year",
+      "expected_accept": false,
+      "decision_correct": true,
+      "arithmetic_correct": null
+    },
+    {
+      "accepted": false,
+      "error_type": "ValueError",
+      "error": "unsupported energy unit",
+      "id": "invalid_currency_as_energy",
+      "expected_accept": false,
+      "decision_correct": true,
+      "arithmetic_correct": null
+    },
+    {
+      "accepted": false,
+      "error_type": "ValueError",
+      "error": "unsupported energy unit",
+      "id": "invalid_power_as_energy",
+      "expected_accept": false,
+      "decision_correct": true,
+      "arithmetic_correct": null
+    },
+    {
+      "accepted": false,
+      "error_type": "ValueError",
+      "error": "invalid numeric energy",
+      "id": "invalid_negative_energy",
+      "expected_accept": false,
+      "decision_correct": true,
+      "arithmetic_correct": null
+    },
+    {
+      "accepted": false,
+      "error_type": "ValueError",
+      "error": "invalid numeric energy",
+      "id": "invalid_nonfinite_energy",
+      "expected_accept": false,
+      "decision_correct": true,
+      "arithmetic_correct": null
+    },
+    {
+      "accepted": false,
+      "error_type": "ValueError",
+      "error": "factor differs from protected reviewed fixture",
+      "id": "invalid_factor_country",
+      "expected_accept": false,
+      "decision_correct": true,
+      "arithmetic_correct": null
+    },
+    {
+      "accepted": false,
+      "error_type": "ValueError",
+      "error": "factor differs from protected reviewed fixture",
+      "id": "invalid_factor_data_year",
+      "expected_accept": false,
+      "decision_correct": true,
+      "arithmetic_correct": null
+    },
+    {
+      "accepted": false,
+      "error_type": "ValueError",
+      "error": "factor differs from protected reviewed fixture",
+      "id": "invalid_factor_unit",
+      "expected_accept": false,
+      "decision_correct": true,
+      "arithmetic_correct": null
+    },
+    {
+      "accepted": false,
+      "error_type": "ValueError",
+      "error": "factor differs from protected reviewed fixture",
+      "id": "invalid_factor_generation_boundary",
+      "expected_accept": false,
+      "decision_correct": true,
+      "arithmetic_correct": null
+    },
+    {
+      "accepted": false,
+      "error_type": "ValueError",
+      "error": "factor differs from protected reviewed fixture",
+      "id": "invalid_factor_value",
+      "expected_accept": false,
+      "decision_correct": true,
+      "arithmetic_correct": null
+    },
+    {
+      "accepted": false,
+      "error_type": "ValueError",
+      "error": "factor differs from protected reviewed fixture",
+      "id": "invalid_factor_unproven_source",
+      "expected_accept": false,
+      "decision_correct": true,
+      "arithmetic_correct": null
+    },
+    {
+      "accepted": false,
+      "error_type": "ValueError",
+      "error": "unsupported activity assurance status",
+      "id": "invalid_claimed_verified_activity",
+      "expected_accept": false,
+      "decision_correct": true,
+      "arithmetic_correct": null
+    },
+    {
+      "accepted": false,
+      "error_type": "ValueError",
+      "error": "duplicate activity identifier",
+      "id": "invalid_duplicate_activity_id",
+      "expected_accept": false,
+      "decision_correct": true,
+      "arithmetic_correct": null
+    },
+    {
+      "accepted": false,
+      "error_type": "ValueError",
+      "error": "overlapping meter intervals",
+      "id": "invalid_same_meter_overlap",
+      "expected_accept": false,
+      "decision_correct": true,
+      "arithmetic_correct": null
+    }
+  ]
+}
