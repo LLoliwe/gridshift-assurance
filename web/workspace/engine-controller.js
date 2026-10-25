@@ -1,4 +1,35 @@
 /** UI-only lifecycle adapter. Never calculates, substitutes, or fabricates results. */
+/**
+ * Split a worker/Pyodide error into a user-facing message and optional technical detail.
+ * A Python traceback is never part of `message`; it is kept only in `detail`.
+ */
+/** Operations that admit raw bytes; a ValueError from them is an intake refusal, not a crash. */
+export const INTAKE_OPERATIONS=Object.freeze(['open','intake']);
+const INTAKE_EXCEPTIONS=Object.freeze(['ValueError','IntakeRefused']);
+/** A worker-side intake refusal, labelled exactly as native Python labels the same refusal. */
+export function intakeRefusal(message){const error=Error(message);error.publicKind='intake_refusal';error.exception='ValueError';return error;}
+export function publicError(error,operation){
+  const raw=String(error?.message??error??'').replace(/\s+$/,'');
+  // A refusal the worker raised itself (before Python) already carries its public kind and exception name.
+  if(error&&typeof error==='object'&&typeof error.publicKind==='string')return {kind:error.publicKind,exception:error.exception??null,message:raw,detail:null};
+  if(!/Traceback \(most recent call last\):/.test(raw))return {kind:'runtime_error',exception:null,message:raw,detail:null};
+  const lines=raw.split('\n');
+  for(let i=lines.length-1;i>=0;i--){
+    const match=lines[i].match(/^([A-Za-z_][\w.]*(?:Error|Exception|Exit|Interrupt|Refused|Refusal)): ?(.*)$/);
+    if(!match)continue;
+    const exception=match[1].split('.').pop();
+    const message=[match[2],...lines.slice(i+1)].join('\n').trim()||exception;
+    const kind=INTAKE_OPERATIONS.includes(operation)&&INTAKE_EXCEPTIONS.includes(exception)?'intake_refusal':'python_error';
+    return {kind,exception,message,detail:raw};
+  }
+  return {kind:'python_error',exception:null,message:'Python reported an error without a readable message.',detail:raw};
+}
+/** Accept a structured worker error; never let a traceback reach `message`, even from an older worker. */
+export function structured(m){
+  const safe=m?.kind?{kind:m.kind,exception:m.exception??null,message:String(m.message||'Review failed'),detail:m.detail??null}:publicError(m?.message||'Review failed');
+  if(/Traceback \(most recent call last\):/.test(safe.message)){const again=publicError(safe.message);safe.message=again.message;safe.detail=safe.detail||again.detail;}
+  return safe;
+}
 export class EngineController {
   constructor({workerFactory,onState=()=>{},onResult=()=>{},onError=()=>{},timeoutMs=90000}) {
     if(typeof workerFactory!=='function') throw new TypeError('workerFactory is required');
@@ -19,7 +50,7 @@ export class EngineController {
   }
   _fail(message,phase){
     this.generation++;this._disposeWorker();this._state('failed');
-    this.onError({phase,message:String(message)});
+    {const safe=publicError(message);this.onError({phase,message:safe.message,detail:safe.detail});}
   }
   start(){
     if(this.destroyed) throw new Error('EngineController has been destroyed');
@@ -41,7 +72,7 @@ export class EngineController {
       if(m.type!=='result'&&m.type!=='error')return;
       const eligible=this.active.eligible;this.active=null;this._state('ready');
       if(!eligible)return;
-      if(m.type==='error')this.onError({phase:'review',message:String(m.message||'Review failed')});
+      if(m.type==='error')this.onError({phase:'review',...structured(m)});
       else this.onResult(m);
     };
     this.errorListener=event=>{
@@ -62,7 +93,7 @@ export class EngineController {
     if(this.destroyed||!this.worker||this.state!=='ready'||this.active)return false;
     const id=++this.sequence;this.active={id,eligible:true};this._state('checking');
     try{this.worker.postMessage({id,type:'review',activities});}
-    catch(error){this.active=null;this._state('ready');this.onError({phase:'review',message:String(error?.message||error)});return false;}
+    catch(error){this.active=null;this._state('ready');this.onError({phase:'review',...publicError(error)});return false;}
     return true;
   }
   invalidate(){

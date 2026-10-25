@@ -1,0 +1,72 @@
+{
+  "schema_version": "gridshift.reconciliation.input.v1",
+  "package_id": "E1-W04",
+  "records": [
+    {
+      "record_id": "A",
+      "source_id": "doc-A",
+      "entity_id": "E1-ENTITY",
+      "site_id": "SITE",
+      "meter_id": "M1",
+      "country": "ZA",
+      "period_start": "2024-01-01",
+      "period_end": "2024-08-01",
+      "quantity": "60",
+      "unit": "MWh",
+      "source_status": "SYNTHETIC",
+      "source_note": "Invented E1 test evidence, not a real meter.",
+      "action": "ORIGINAL",
+      "target_record_id": null
+    },
+    {
+      "record_id": "B",
+      "source_id": "doc-B",
+      "entity_id": "E1-ENTITY",
+      "site_id": "SITE",
+      "meter_id": "M1",
+      "country": "ZA",
+      "period_start": "2024-07-01",
+      "period_end": "2025-01-01",
+      "quantity": "50",
+      "unit": "MWh",
+      "source_status": "SYNTHETIC",
+      "source_note": "Invented E1 test evidence, not a real meter.",
+      "action": "ORIGINAL",
+      "target_record_id": null
+    }
+  ],
+  "coverage": [
+    {
+      "entity_id": "E1-ENTITY",
+      "site_id": "SITE",
+      "meter_id": "M1",
+      "country": "ZA",
+      "period_start": "2024-01-01",
+      "period_end": "2025-01-01"
+    }
+  ],
+  "report": {
+    "claim_type": "CONDITIONAL_INVENTORY_ESTIMATE",
+    "energy_mwh": "110",
+    "emissions_tco2e": "105.6",
+    "factor_id": "ZA_NGGEF_2024_DFFE_2026",
+    "data_year": 2024,
+    "boundary": "SCOPE2_LOCATION_BASED_PURCHASED_ELECTRICITY",
+    "activity_statuses": [
+      "SYNTHETIC"
+    ],
+    "limitations": [
+      "NOT_AN_INDEPENDENT_VERIFICATION",
+      "NOT_BLOCKCHAIN",
+      "NOT_MEASURED_SAVINGS",
+      "EXCLUDES_SCOPE3_T_AND_D",
+      "ANNUAL_AVERAGE_NOT_TIME_OF_USE",
+      "ACTIVITY_NOT_VERIFIED",
+      "PUBLISHED_FACTOR_INPUT_RECONCILIATION_UNRESOLVED",
+      "MARKET_BASED_NOT_COMPUTED",
+      "ORGANIZATIONAL_BOUNDARY_NOT_REVIEWED",
+      "NOT_FULL_SCOPE2_COMPLIANCE"
+    ]
+  },
+  "resolutions": []
+}

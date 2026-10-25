@@ -1,0 +1,325 @@
+{
+ "manifest_cases": 31,
+ "runtimes": {
+  "native": {
+   "runtime": "native-cpython",
+   "python": "3.13.5",
+   "browser": null,
+   "pyodide_python": null,
+   "pyodide_runtime": null
+  },
+  "browser": {
+   "runtime": "chromium-pyodide-worker",
+   "python": null,
+   "browser": "156.0.8078.4",
+   "pyodide_python": "3.14.2 (main, Sep 14 2026, 03:03:51) [Clang 23.0.0git (https:/github.com/llvm/llvm-project e5927fecf8a6ce89e1a4eac5b8",
+   "pyodide_runtime": "314.0.7"
+  }
+ },
+ "cases": [
+  {
+   "id": "C01_flagship_control",
+   "attack": "control: synthetic A/B/C flagship",
+   "native_expectation_failures": [],
+   "browser_expectation_failures": [],
+   "policy_divergences": [],
+   "message_divergences": []
+  },
+  {
+   "id": "C02_duplicate_key_top",
+   "attack": "duplicate top-level key",
+   "native_expectation_failures": [],
+   "browser_expectation_failures": [],
+   "policy_divergences": [],
+   "message_divergences": []
+  },
+  {
+   "id": "C03_duplicate_key_escaped",
+   "attack": "duplicate key via JSON unicode escape",
+   "native_expectation_failures": [],
+   "browser_expectation_failures": [],
+   "policy_divergences": [],
+   "message_divergences": []
+  },
+  {
+   "id": "C04_duplicate_key_nested",
+   "attack": "duplicate key inside a record",
+   "native_expectation_failures": [],
+   "browser_expectation_failures": [],
+   "policy_divergences": [],
+   "message_divergences": []
+  },
+  {
+   "id": "C05_invalid_utf8",
+   "attack": "invalid UTF-8 byte",
+   "native_expectation_failures": [],
+   "browser_expectation_failures": [],
+   "policy_divergences": [],
+   "message_divergences": []
+  },
+  {
+   "id": "C06_utf8_bom",
+   "attack": "UTF-8 byte-order mark",
+   "native_expectation_failures": [],
+   "browser_expectation_failures": [],
+   "policy_divergences": [],
+   "message_divergences": []
+  },
+  {
+   "id": "C07_lone_surrogate",
+   "attack": "escaped lone surrogate (unencodable text)",
+   "native_expectation_failures": [],
+   "browser_expectation_failures": [],
+   "policy_divergences": [],
+   "message_divergences": []
+  },
+  {
+   "id": "C08_nan_literal",
+   "attack": "NaN literal",
+   "native_expectation_failures": [],
+   "browser_expectation_failures": [],
+   "policy_divergences": [],
+   "message_divergences": []
+  },
+  {
+   "id": "C09_overflow_float",
+   "attack": "float literal overflowing to infinity",
+   "native_expectation_failures": [],
+   "browser_expectation_failures": [],
+   "policy_divergences": [],
+   "message_divergences": []
+  },
+  {
+   "id": "C10_extreme_numeric_string",
+   "attack": "extreme exponent decimal string",
+   "native_expectation_failures": [],
+   "browser_expectation_failures": [],
+   "policy_divergences": [],
+   "message_divergences": []
+  },
+  {
+   "id": "C11_huge_int_literal",
+   "attack": "integer literal beyond str-digit limit",
+   "native_expectation_failures": [],
+   "browser_expectation_failures": [],
+   "policy_divergences": [],
+   "message_divergences": []
+  },
+  {
+   "id": "C12_float_year",
+   "attack": "data_year as float 2024.0 (type gate)",
+   "native_expectation_failures": [
+    "open should succeed but failed: ValueError: JSON number at $.report.data_year is a non-integer or exponent form. Exact quantities must be decimal strings; this case was not opened and the original input was not changed."
+   ],
+   "browser_expectation_failures": [
+    "open should succeed but failed: ValueError: JSON number at $.report.data_year is a non-integer or exponent form. Exact quantities must be decimal strings; this case was not opened and the original input was not changed."
+   ],
+   "policy_divergences": [],
+   "message_divergences": []
+  },
+  {
+   "id": "C13_exponent_year",
+   "attack": "data_year as exponent float 2.024e3 (type gate)",
+   "native_expectation_failures": [
+    "open should succeed but failed: ValueError: JSON number at $.report.data_year is a non-integer or exponent form. Exact quantities must be decimal strings; this case was not opened and the original input was not changed."
+   ],
+   "browser_expectation_failures": [
+    "open should succeed but failed: ValueError: JSON number at $.report.data_year is a non-integer or exponent form. Exact quantities must be decimal strings; this case was not opened and the original input was not changed."
+   ],
+   "policy_divergences": [],
+   "message_divergences": []
+  },
+  {
+   "id": "C14_big_int_unknown_field",
+   "attack": "unsupported field holding an integer beyond 2^53",
+   "native_expectation_failures": [
+    "open should succeed but failed: ValueError: JSON integer at $.report.unreviewed_extension is outside the exactly portable range ±(2^53−1). Use a decimal string; this case was not opened and the original input was not changed."
+   ],
+   "browser_expectation_failures": [
+    "open should succeed but failed: ValueError: JSON integer at $.report.unreviewed_extension is outside the exactly portable range ±(2^53−1). Use a decimal string; this case was not opened and the original input was not changed."
+   ],
+   "policy_divergences": [],
+   "message_divergences": []
+  },
+  {
+   "id": "C15_oversized_raw",
+   "attack": "raw package above 64 KiB",
+   "native_expectation_failures": [],
+   "browser_expectation_failures": [],
+   "policy_divergences": [],
+   "message_divergences": []
+  },
+  {
+   "id": "C16_deep_nesting",
+   "attack": "deep nesting",
+   "native_expectation_failures": [],
+   "browser_expectation_failures": [],
+   "policy_divergences": [],
+   "message_divergences": []
+  },
+  {
+   "id": "C17_empty",
+   "attack": "empty file",
+   "native_expectation_failures": [],
+   "browser_expectation_failures": [],
+   "policy_divergences": [],
+   "message_divergences": [
+    {
+     "index": 0,
+     "step": "open",
+     "native": "ValueError: Input must contain 1–786432 UTF-8 bytes.",
+     "browser": "JSWorkerError: Open expects 1–768 KiB of original raw file bytes."
+    }
+   ]
+  },
+  {
+   "id": "C18_trailing_document",
+   "attack": "second JSON document appended",
+   "native_expectation_failures": [],
+   "browser_expectation_failures": [],
+   "policy_divergences": [],
+   "message_divergences": []
+  },
+  {
+   "id": "C19_top_level_array",
+   "attack": "non-object top level",
+   "native_expectation_failures": [],
+   "browser_expectation_failures": [],
+   "policy_divergences": [],
+   "message_divergences": []
+  },
+  {
+   "id": "C20_forged_cached_accept",
+   "attack": "forged cached ACCEPT with altered totals in an otherwise valid envelope",
+   "native_expectation_failures": [],
+   "browser_expectation_failures": [],
+   "policy_divergences": [],
+   "message_divergences": []
+  },
+  {
+   "id": "C21_false_reviewer_history",
+   "attack": "imported false \"AUTHENTICATED\" reviewer history",
+   "native_expectation_failures": [],
+   "browser_expectation_failures": [],
+   "policy_divergences": [],
+   "message_divergences": []
+  },
+  {
+   "id": "C22_original_parsed_disagree",
+   "attack": "original raw bytes vs parsed disagreement",
+   "native_expectation_failures": [],
+   "browser_expectation_failures": [],
+   "policy_divergences": [],
+   "message_divergences": []
+  },
+  {
+   "id": "C23_raw_hash_mismatch",
+   "attack": "original raw hash mismatch",
+   "native_expectation_failures": [],
+   "browser_expectation_failures": [],
+   "policy_divergences": [],
+   "message_divergences": []
+  },
+  {
+   "id": "C24_unknown_envelope_version",
+   "attack": "unknown envelope version",
+   "native_expectation_failures": [],
+   "browser_expectation_failures": [],
+   "policy_divergences": [],
+   "message_divergences": []
+  },
+  {
+   "id": "C25_post_acceptance_edit",
+   "attack": "post-acceptance working edit then stale proposal hash",
+   "native_expectation_failures": [],
+   "browser_expectation_failures": [],
+   "policy_divergences": [],
+   "message_divergences": []
+  },
+  {
+   "id": "C26_raw_with_matching_preapproval",
+   "attack": "raw package carrying a resolution with the exact current hash",
+   "native_expectation_failures": [],
+   "browser_expectation_failures": [],
+   "policy_divergences": [],
+   "message_divergences": []
+  },
+  {
+   "id": "C27_wrong_hash_accept",
+   "attack": "acceptance of a non-current proposal hash",
+   "native_expectation_failures": [],
+   "browser_expectation_failures": [],
+   "policy_divergences": [],
+   "message_divergences": []
+  },
+  {
+   "id": "C28_xss_strings",
+   "attack": "HTML/script-like imported strings",
+   "native_expectation_failures": [],
+   "browser_expectation_failures": [],
+   "policy_divergences": [],
+   "message_divergences": []
+  },
+  {
+   "id": "C29_incomplete_coverage",
+   "attack": "declared coverage without a surviving record (missing is not zero)",
+   "native_expectation_failures": [],
+   "browser_expectation_failures": [],
+   "policy_divergences": [],
+   "message_divergences": []
+  },
+  {
+   "id": "C30_proto_key",
+   "attack": "__proto__ key in a record",
+   "native_expectation_failures": [],
+   "browser_expectation_failures": [],
+   "policy_divergences": [],
+   "message_divergences": []
+  },
+  {
+   "id": "C31_float_one_unknown_field",
+   "attack": "unsupported field holding float 1.0",
+   "native_expectation_failures": [
+    "open should succeed but failed: ValueError: JSON number at $.report.unreviewed_extension is a non-integer or exponent form. Exact quantities must be decimal strings; this case was not opened and the original input was not changed."
+   ],
+   "browser_expectation_failures": [
+    "open should succeed but failed: ValueError: JSON number at $.report.unreviewed_extension is a non-integer or exponent form. Exact quantities must be decimal strings; this case was not opened and the original input was not changed."
+   ],
+   "policy_divergences": [],
+   "message_divergences": []
+  }
+ ],
+ "ui": {
+  "C28_xss_strings": {
+   "opened": true,
+   "decision": "Correction proposed",
+   "notice": "Python review complete. Inspect the decision and declared evidence.",
+   "case_title": "<b id=\"xss-pkg\">X</b>",
+   "xss_flag": null,
+   "injected_nodes": 0
+  },
+  "C12_float_year": {
+   "opened": true,
+   "decision": "Correction proposed",
+   "notice": "Python review complete. Inspect the decision and declared evidence.",
+   "case_title": "<b id=\"xss-pkg\">X</b>",
+   "xss_flag": null,
+   "injected_nodes": 0
+  },
+  "C14_big_int_unknown_field": {
+   "opened": true,
+   "decision": "Correction proposed",
+   "notice": "Python review complete. Inspect the decision and declared evidence.",
+   "case_title": "<b id=\"xss-pkg\">X</b>",
+   "xss_flag": null,
+   "injected_nodes": 0
+  }
+ },
+ "page_errors": [],
+ "xss_ui_inert": true,
+ "totals": {
+  "expectation_failures": 8,
+  "policy_divergences": 0,
+  "message_only_divergences": 1
+ }
+}

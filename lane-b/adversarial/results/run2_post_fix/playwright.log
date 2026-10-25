@@ -1,0 +1,24 @@
+[WebServer] 127.0.0.1 - - [25/Oct/2026 19:51:15] "GET /workspace/ HTTP/1.1" 200 -
+
+Running 1 test using 1 worker
+
+[WebServer] 127.0.0.1 - - [25/Oct/2026 19:51:16] "GET /workspace/ HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 19:51:16] "GET /workspace/workspace.css HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 19:51:16] "GET /workspace/workspace.js HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 19:51:16] "GET /workspace/engine-controller.js HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 19:51:16] "GET /workspace/workspace-state.js HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 19:51:16] "GET /workspace/workspace-worker.js HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 19:51:16] "GET /engine/src/emissions.py HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 19:51:16] "GET /engine/src/reconciliation.py HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 19:51:16] "GET /engine/fixtures/za_grid_factor_2024.json HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 19:51:16] "GET /workspace/case_adapter.py HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 19:51:18] "GET /engine/src/emissions.py HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 19:51:18] "GET /engine/src/reconciliation.py HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 19:51:18] "GET /engine/fixtures/za_grid_factor_2024.json HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 19:51:18] "GET /workspace/case_adapter.py HTTP/1.1" 200 -
+browser run complete: 31 cases; browser 156.0.8078.4; 3.14.2
+(node:32676) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 cross-runtime.spec.mjs:8:1 › frozen adversarial cases through the real browser worker (17.2s)
+
+  1 passed (18.0s)

@@ -1,0 +1,459 @@
+{
+ "schema": "gridshift.laneb.adversarial.manifest.v1",
+ "source_fixture_sha256": "c997faff46efaf53c05c68066860da3ec9c411f7004c66be83c978fc329968a6",
+ "cases": [
+  {
+   "id": "C01_flagship_control",
+   "attack": "control: synthetic A/B/C flagship",
+   "bytes": 2610,
+   "sha256": "c997faff46efaf53c05c68066860da3ec9c411f7004c66be83c978fc329968a6",
+   "steps": [
+    "open",
+    "review",
+    "accept_current",
+    "reopen_export",
+    "review"
+   ],
+   "expect": {
+    "open": "OK",
+    "decisions": [
+     "CORRECT",
+     "ACCEPT",
+     null,
+     "CORRECT"
+    ],
+    "emissions": "96"
+   }
+  },
+  {
+   "id": "C02_duplicate_key_top",
+   "attack": "duplicate top-level key",
+   "bytes": 2634,
+   "sha256": "a5431bfb16b84a17dea1680b84236cfbd7b00baefa1f9aa9c9d9367cd62d9906",
+   "steps": [
+    "open"
+   ],
+   "expect": {
+    "open": "REFUSED"
+   }
+  },
+  {
+   "id": "C03_duplicate_key_escaped",
+   "attack": "duplicate key via JSON unicode escape",
+   "bytes": 2639,
+   "sha256": "825d0f1f90192cbf90da5ca5ad60a557db06630929786353e01ab20f3465564c",
+   "steps": [
+    "open"
+   ],
+   "expect": {
+    "open": "REFUSED"
+   }
+  },
+  {
+   "id": "C04_duplicate_key_nested",
+   "attack": "duplicate key inside a record",
+   "bytes": 2627,
+   "sha256": "c94e2199ff2cd8ce51c43c2059f9ec3a505bb893e6fce9f4680ba3b20548b6af",
+   "steps": [
+    "open"
+   ],
+   "expect": {
+    "open": "REFUSED"
+   }
+  },
+  {
+   "id": "C05_invalid_utf8",
+   "attack": "invalid UTF-8 byte",
+   "bytes": 2611,
+   "sha256": "9c2de8f015d5d56664d7923947b23a09cc6a74788fbb4a5adc29247b98eee398",
+   "steps": [
+    "open"
+   ],
+   "expect": {
+    "open": "REFUSED"
+   }
+  },
+  {
+   "id": "C06_utf8_bom",
+   "attack": "UTF-8 byte-order mark",
+   "bytes": 2613,
+   "sha256": "3da84d75a8af0aea8c9d761e66db7e4d0d1427e805089d3a4afefad621743367",
+   "steps": [
+    "open"
+   ],
+   "expect": {
+    "open": "REFUSED"
+   }
+  },
+  {
+   "id": "C07_lone_surrogate",
+   "attack": "escaped lone surrogate (unencodable text)",
+   "bytes": 2617,
+   "sha256": "0cf8c8adffdba676379c1aeb8b702fb621519f3c679bf6d1145393c9f6cc72fe",
+   "steps": [
+    "open"
+   ],
+   "expect": {
+    "open": "REFUSED"
+   }
+  },
+  {
+   "id": "C08_nan_literal",
+   "attack": "NaN literal",
+   "bytes": 2608,
+   "sha256": "b24ec39d2661f8a30f640a6b4a93f9f062c2c77cd9ad0c0b59513fd77ae27af3",
+   "steps": [
+    "open"
+   ],
+   "expect": {
+    "open": "REFUSED"
+   }
+  },
+  {
+   "id": "C09_overflow_float",
+   "attack": "float literal overflowing to infinity",
+   "bytes": 2610,
+   "sha256": "57c5e3afa5bc828e85c2d482c1d4ee7a28c556cefa7640f87d33c512a8098f46",
+   "steps": [
+    "open"
+   ],
+   "expect": {
+    "open": "REFUSED"
+   }
+  },
+  {
+   "id": "C10_extreme_numeric_string",
+   "attack": "extreme exponent decimal string",
+   "bytes": 2615,
+   "sha256": "0a789e152e892e9c5f33ced072c08f5ed24179e99876ea9defbf838dd38aa25a",
+   "steps": [
+    "open",
+    "review"
+   ],
+   "expect": {
+    "open": "OK",
+    "decisions": [
+     "WITHHOLD"
+    ]
+   }
+  },
+  {
+   "id": "C11_huge_int_literal",
+   "attack": "integer literal beyond str-digit limit",
+   "bytes": 7606,
+   "sha256": "0d314293ff6133cdfdb80a3e14dddfa2de0c672efe6b6b221b46c58a432966f5",
+   "steps": [
+    "open"
+   ],
+   "expect": {
+    "open": "REFUSED"
+   }
+  },
+  {
+   "id": "C12_float_year",
+   "attack": "data_year as float 2024.0 (type gate)",
+   "bytes": 2612,
+   "sha256": "12705b14b86e91f70d67322fc3ea84515469ebc9744a3b415e2ce2f9f30553cf",
+   "steps": [
+    "open",
+    "review"
+   ],
+   "expect": {
+    "open": "OK",
+    "decisions": [
+     "WITHHOLD"
+    ]
+   }
+  },
+  {
+   "id": "C13_exponent_year",
+   "attack": "data_year as exponent float 2.024e3 (type gate)",
+   "bytes": 2613,
+   "sha256": "b9e8e9acec161fc7c8f69186357dd186e8b6424f0c3f5d1c0c3b77921a61c3de",
+   "steps": [
+    "open",
+    "review"
+   ],
+   "expect": {
+    "open": "OK",
+    "decisions": [
+     "WITHHOLD"
+    ]
+   }
+  },
+  {
+   "id": "C14_big_int_unknown_field",
+   "attack": "unsupported field holding an integer beyond 2^53",
+   "bytes": 2413,
+   "sha256": "a9718154dcbe302cff846f9679480e9e19bbe2288e6fe3196e7c05e4800cda80",
+   "steps": [
+    "open",
+    "review",
+    "reopen_export"
+   ],
+   "expect": {
+    "open": "OK",
+    "decisions": [
+     "WITHHOLD",
+     null
+    ],
+    "working_equals_original_after_open": true
+   }
+  },
+  {
+   "id": "C15_oversized_raw",
+   "attack": "raw package above 64 KiB",
+   "bytes": 68146,
+   "sha256": "d2bd27ca1f66e14fbb1927e90d1f40fef483a81d396ab0aea33b85332e9912ae",
+   "steps": [
+    "open"
+   ],
+   "expect": {
+    "open": "REFUSED"
+   }
+  },
+  {
+   "id": "C16_deep_nesting",
+   "attack": "deep nesting",
+   "bytes": 81,
+   "sha256": "99504c2fc383bb51580b268e33309910b3de0d51d3eb6be7511ce3a3664f5868",
+   "steps": [
+    "open"
+   ],
+   "expect": {
+    "open": "REFUSED"
+   }
+  },
+  {
+   "id": "C17_empty",
+   "attack": "empty file",
+   "bytes": 0,
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "steps": [
+    "open"
+   ],
+   "expect": {
+    "open": "REFUSED"
+   }
+  },
+  {
+   "id": "C18_trailing_document",
+   "attack": "second JSON document appended",
+   "bytes": 2612,
+   "sha256": "c39d80986e5069405f92a209f4f70b7221daa64254c4941ac20c3761cbe533f3",
+   "steps": [
+    "open"
+   ],
+   "expect": {
+    "open": "REFUSED"
+   }
+  },
+  {
+   "id": "C19_top_level_array",
+   "attack": "non-object top level",
+   "bytes": 2612,
+   "sha256": "ee76d18a419429fdc64233228747ca35be96018560e23cef8c34206ec39f45a3",
+   "steps": [
+    "open"
+   ],
+   "expect": {
+    "open": "REFUSED"
+   }
+  },
+  {
+   "id": "C20_forged_cached_accept",
+   "attack": "forged cached ACCEPT with altered totals in an otherwise valid envelope",
+   "bytes": 13204,
+   "sha256": "281260a81708c1ee84323aaf5610f2c00fdabc289f9f16e5ef6d0b639e08a8bf",
+   "steps": [
+    "open",
+    "review"
+   ],
+   "expect": {
+    "open": "OK",
+    "cached_review_null": true,
+    "active_resolutions": 0,
+    "decisions": [
+     "CORRECT"
+    ]
+   }
+  },
+  {
+   "id": "C21_false_reviewer_history",
+   "attack": "imported false \"AUTHENTICATED\" reviewer history",
+   "bytes": 14032,
+   "sha256": "0080052959c0b05135401c7554913c93b974d1cce0454c320c3892d841c00ced",
+   "steps": [
+    "open",
+    "review"
+   ],
+   "expect": {
+    "open": "OK",
+    "active_resolutions": 0,
+    "decisions": [
+     "CORRECT"
+    ]
+   }
+  },
+  {
+   "id": "C22_original_parsed_disagree",
+   "attack": "original raw bytes vs parsed disagreement",
+   "bytes": 13808,
+   "sha256": "f2c8fd962bbde280260f31ce277903d757f91d3c1856d01542cbfd9ec27129b2",
+   "steps": [
+    "open"
+   ],
+   "expect": {
+    "open": "REFUSED"
+   }
+  },
+  {
+   "id": "C23_raw_hash_mismatch",
+   "attack": "original raw hash mismatch",
+   "bytes": 13809,
+   "sha256": "3528a65aa549b82e2acc2133354599e32a5b99a2852e66dbd6d604f1a128814d",
+   "steps": [
+    "open"
+   ],
+   "expect": {
+    "open": "REFUSED"
+   }
+  },
+  {
+   "id": "C24_unknown_envelope_version",
+   "attack": "unknown envelope version",
+   "bytes": 13809,
+   "sha256": "82e0ba4eaa3bd4c6c75930a64ca3d3fbd089eacae68ebb839020e936164d5cbc",
+   "steps": [
+    "open"
+   ],
+   "expect": {
+    "open": "REFUSED"
+   }
+  },
+  {
+   "id": "C25_post_acceptance_edit",
+   "attack": "post-acceptance working edit then stale proposal hash",
+   "bytes": 13809,
+   "sha256": "fc73b8e376215db252037730331d1f60acb2fc99fccf98b73cbb55cbd9f82d43",
+   "steps": [
+    "open",
+    "review",
+    "accept_hash:68f7289fedc419434ac4adf01b6d637053ab4bb69888876ee632a1880ba2f415"
+   ],
+   "expect": {
+    "open": "OK",
+    "active_resolutions": 0,
+    "decisions": [
+     "CORRECT"
+    ],
+    "final": "ERROR"
+   }
+  },
+  {
+   "id": "C26_raw_with_matching_preapproval",
+   "attack": "raw package carrying a resolution with the exact current hash",
+   "bytes": 2584,
+   "sha256": "ae9a90b785bf0536f4780d853dd3dc855381a1940569cf7e7726b5fadd3cc149",
+   "steps": [
+    "open",
+    "review"
+   ],
+   "expect": {
+    "open": "OK",
+    "active_resolutions": 0,
+    "decisions": [
+     "CORRECT"
+    ]
+   }
+  },
+  {
+   "id": "C27_wrong_hash_accept",
+   "attack": "acceptance of a non-current proposal hash",
+   "bytes": 2610,
+   "sha256": "c997faff46efaf53c05c68066860da3ec9c411f7004c66be83c978fc329968a6",
+   "steps": [
+    "open",
+    "review",
+    "accept_hash:0000000000000000000000000000000000000000000000000000000000000000"
+   ],
+   "expect": {
+    "open": "OK",
+    "decisions": [
+     "CORRECT"
+    ],
+    "final": "ERROR"
+   }
+  },
+  {
+   "id": "C28_xss_strings",
+   "attack": "HTML/script-like imported strings",
+   "bytes": 2398,
+   "sha256": "3dbd20a55b601358bcde1178699b1c89ee80567ed083fee78a87202a5897c149",
+   "steps": [
+    "open",
+    "review"
+   ],
+   "expect": {
+    "open": "OK",
+    "decisions": [
+     "CORRECT"
+    ],
+    "ui_inert": true
+   }
+  },
+  {
+   "id": "C29_incomplete_coverage",
+   "attack": "declared coverage without a surviving record (missing is not zero)",
+   "bytes": 1954,
+   "sha256": "dea46efc2c1318a30101bfd8ef593371f676b9675eb0188f7e4c2e17342110a0",
+   "steps": [
+    "open",
+    "review"
+   ],
+   "expect": {
+    "open": "OK",
+    "decisions": [
+     "WITHHOLD"
+    ],
+    "no_total": true
+   }
+  },
+  {
+   "id": "C30_proto_key",
+   "attack": "__proto__ key in a record",
+   "bytes": 2415,
+   "sha256": "14b6a5b393a0ed5955bca6bb43db3d5028133b210a7d5ed89e64529a493c1b66",
+   "steps": [
+    "open",
+    "review",
+    "reopen_export"
+   ],
+   "expect": {
+    "open": "OK",
+    "decisions": [
+     "WITHHOLD",
+     null
+    ],
+    "working_equals_original_after_open": true
+   }
+  },
+  {
+   "id": "C31_float_one_unknown_field",
+   "attack": "unsupported field holding float 1.0",
+   "bytes": 2396,
+   "sha256": "76622ae9f19d975ddfc9b8595257b2555878c7cabee5b15ac84ec1ed015dc90b",
+   "steps": [
+    "open",
+    "review"
+   ],
+   "expect": {
+    "open": "OK",
+    "decisions": [
+     "WITHHOLD"
+    ],
+    "working_equals_original_after_open": true
+   }
+  }
+ ]
+}

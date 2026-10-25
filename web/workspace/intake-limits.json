@@ -1,0 +1,8 @@
+{
+ "schema": "gridshift.workspace.intake-limits.v1",
+ "note": "Single source for intake size limits and their user-facing text, read by case_adapter.py (native and Pyodide) and by workspace-worker.js / workspace.js.",
+ "envelope_limit_bytes": 786432,
+ "raw_limit_bytes": 65536,
+ "open_size_message": "Open expects 1 byte to 768 KiB (786432 bytes) of original raw file bytes.",
+ "original_size_message": "Original evidence must contain 1 byte to 64 KiB (65536 bytes)."
+}

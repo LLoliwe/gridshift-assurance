@@ -27,6 +27,9 @@ for(const match of html.matchAll(/<([a-z][a-z0-9-]*)\b([^>]*?)\bid="([^"]+)"([^>
 const body=new Element('body');globalThis.document={body,getElementById:id=>ids.get(id),createElement:tag=>new Element(tag),querySelectorAll:query=>{assert.equal(query,'#records button');const result=[];const walk=node=>{if(node.tagName==='BUTTON')result.push(node);for(const child of node.children)walk(child);};walk(ids.get('records'));return result;}};
 globalThis.window={addEventListener:(type,fn)=>windowEvents.set(type,fn)};
 const blobs=new Map();let blobId=0;URL.createObjectURL=blob=>{const key=`blob:test-${++blobId}`;blobs.set(key,blob);return key;};URL.revokeObjectURL=()=>{};
+import {publicError} from '../web/workspace/engine-controller.js';
+// Native errors are wrapped the way Pyodide reports them, then structured by the real shared publicError.
+const pyodideTrace=message=>`Traceback (most recent call last):\n  File "/lib/python314.zip/_pyodide/_base.py", line 597, in eval_code_async\n  File "/gridshift/src/case_adapter.py", line 24, in _require\n    raise ValueError(message)\nValueError: ${message}\n`;
 let workerCount=0;
 class NativeWorker {
  constructor(){this.events=new Map();this.terminated=false;workerCount++;}
@@ -35,7 +38,7 @@ class NativeWorker {
   if(message.type==='init'){queueMicrotask(()=>this.send({id:message.id,type:'ready'}));return;}
   if(holdNextReview){holdNextReview=false;heldReview={worker:this,message};return;}
   let request=message.activities;if(request.operation==='open')request={operation:'open',raw_base64:Buffer.from(request.raw).toString('base64')};
-  const child=execFile('python',[new URL('./workspace-native-driver.py',import.meta.url).pathname],{maxBuffer:4*1024*1024},(error,stdout)=>{if(error){this.send({id:message.id,type:'error',message:String(error)});return;}const result=JSON.parse(stdout);this.send(result.ok?{id:message.id,type:'result',...result.value}:{id:message.id,type:'error',message:result.message});});child.stdin.end(JSON.stringify(request));
+  const child=execFile('python',[new URL('./workspace-native-driver.py',import.meta.url).pathname],{maxBuffer:4*1024*1024},(error,stdout)=>{if(error){this.send({id:message.id,type:'error',message:String(error)});return;}const result=JSON.parse(stdout);this.send(result.ok?{id:message.id,type:'result',...result.value}:{id:message.id,type:'error',...publicError(pyodideTrace(result.message),request.operation)});});child.stdin.end(JSON.stringify(request));
  }
  send(data){if(!this.terminated)this.events.get('message')?.({data});}
 }
@@ -44,8 +47,9 @@ const $=id=>{const node=ids.get(id);assert.ok(node,`Missing element ${id}`);retu
 const tick=()=>new Promise(resolve=>setTimeout(resolve,10));
 async function until(fn,label){for(let i=0;i<500;i++){if(fn())return;await tick();}throw Error(`Timed out: ${label}; notice=${$('notice').textContent}`);}
 async function input(id,value){$(id).value=value;await $(id).emit('input');}
-async function open(raw){$('case-file').files=[{size:raw.length,arrayBuffer:async()=>Uint8Array.from(raw).buffer}];await $('case-file').emit('change');await until(()=>$('runtime').textContent==='Python runtime ready'&&!$('run').disabled,'open');}
-await import('../web/workspace/workspace.js');await until(()=>$('runtime').textContent==='Python runtime ready','init');
+async function open(raw){$('case-file').files=[{size:raw.length,arrayBuffer:async()=>Uint8Array.from(raw).buffer}];await $('case-file').emit('change');await until(()=>$('runtime').textContent==='Ready'&&!$('run').disabled,'open');}
+for(const id of ['case-file','new-case','example','load-example'])assert.equal($(id).disabled,true,`${id} disabled in markup before runtime`);{const html=await readFile(new URL('../web/workspace/index.html',import.meta.url),'utf8');for(const id of ['notice','runtime'])$(id).textContent=html.match(new RegExp(`id="${id}"[^>]*>([^<]*)<`))[1];}assert.equal($('notice').textContent,'Getting the calculator ready. Opening a case unlocks in a moment.');assert.equal($('runtime').textContent,'Loading calculator…');
+await import('../web/workspace/workspace.js');await until(()=>$('runtime').textContent==='Ready','init');for(const id of ['case-file','new-case','example','load-example'])assert.equal($(id).disabled,false,`${id} enabled once Ready`);assert.equal($('runtime').dataset.state,'ready');assert.equal($('notice').textContent,'Open a declared case, or enter the original report and evidence using guided fields.');
 const p=JSON.parse(await readFile(new URL('../web/reconcile/flagship.json',import.meta.url),'utf8'));
 p.package_id='DEVELOPMENT-UNFAMILIAR-IDS';p.records[0].record_id='invoice-z';p.records[0].source_id='statement-z';p.records[0].quantity='12.50';p.records[1].record_id='amendment-q';p.records[1].source_id='statement-q';p.records[1].quantity='11.75';p.records[1].action='ORIGINAL';p.records[1].target_record_id=null;p.records[2].record_id='meter-t';p.records[2].quantity='2.50';p.report.energy_mwh='27';p.report.emissions_tco2e='25.92';
 const raw=Buffer.from(JSON.stringify(p,null,2));await open(raw);assert.equal($('case-title').textContent,p.package_id);assert.equal($('original-energy').textContent,'27 MWh');
@@ -58,6 +62,14 @@ await $('export-case').click();await until(()=>downloads.some(x=>x.name.endsWith
 await $('export-summary').click();await until(()=>downloads.some(x=>x.name.endsWith('.txt')),'summary export');assert.ok((await downloads.find(x=>x.name.endsWith('.txt')).blob.text()).includes('REVIEWER ACCEPTED THIS EXACT CORRECTION'));
 await open(Buffer.from(json));assert.equal($('decision-title').textContent,'Not reviewed');await $('run').click();await until(()=>$('decision-title').textContent==='Correction proposed','reopen reconfirmation');assert.equal($('confirm').checked,false);
 const before=$('case-title').textContent;await open(Buffer.from('{"x":1,"x":2}'));assert.equal($('case-title').textContent,before);assert.ok($('notice').textContent.includes('previous case is intact'));assert.equal($('records').textContent.includes('Included'),false,'Invalidated intake must clear the derived inclusion ledger');
+// Regression: refusal notice is user-facing only; any traceback lives in the collapsed Technical details.
+{const floatYear=JSON.stringify(p,null,2).replace(/"data_year": 2024\b/,'"data_year": 2024.0');assert.notEqual(floatYear,JSON.stringify(p,null,2),'fixture must contain data_year 2024');
+const kept=$('case-title').textContent;await open(Buffer.from(floatYear));assert.equal($('case-title').textContent,kept);
+assert.equal($('notice').textContent.includes('Traceback'),false,`notice leaked a traceback: ${$('notice').textContent}`);assert.equal($('notice').textContent.includes('File "'),false);
+assert.match($('notice').textContent,/^Case was not opened; the previous case is intact, but rerun is required\. data_year at \$\.report\.data_year .*JSON integer 2024/);
+assert.equal($('notice-details').hidden,false);assert.equal($('notice-details').open,false);assert.match($('notice-trace').textContent,/^Traceback \(most recent call last\):/);
+}
+
 await $('revise').click();await input('record-1-quantity','11.00');await $('cancel-revision').click();assert.equal($('decision-title').textContent,'Not reviewed');assert.equal($('revision-editor').hidden,true);
 // An interrupted review must not leave the new revision permanently busy.
 await $('run').click();await $('revise').click();await input('record-1-quantity','11.25');await input('revision-reason','Later development source statement');await $('revision-form').emit('submit');await until(()=>!$('run').disabled,'edit during pending review');assert.equal($('decision-title').textContent,'Not reviewed');
@@ -72,15 +84,15 @@ await $('revision-form').emit('submit');await until(()=>!$('run').disabled&&$('c
 await open(raw);await $('run').click();
 let resolveRaw;const delayed=new Promise(resolve=>{resolveRaw=resolve;});
 $('case-file').files=[{size:raw.length,arrayBuffer:()=>delayed}];const selection=$('case-file').emit('change');
-await until(()=>$('runtime').textContent==='Python runtime ready','prior response during delayed read');
+await until(()=>$('runtime').textContent==='Ready','prior response during delayed read');
 assert.equal($('decision-title').textContent,'Not reviewed','Earlier review must not render during a new file read');
 assert.equal($('export-case').disabled,true);assert.equal($('accept').disabled,true);
 resolveRaw(Uint8Array.from(raw).buffer);await selection;await until(()=>!$('run').disabled,'finish delayed intake');
 // A request that is invalidated while hung must still time out and allow recovery.
-holdNextReview=true;await $('run').click();await $('revise').click();assert.equal($('runtime').textContent,'Python is checking');
+holdNextReview=true;await $('run').click();await $('revise').click();assert.equal($('runtime').textContent,'Checking');
 assert.ok(longTimers.size>0);for(const [id,fn] of [...longTimers]){longTimers.delete(id);realClearTimeout(id);fn();}
-assert.equal($('runtime').textContent,'Runtime paused');assert.equal($('retry').hidden,false);assert.equal($('accept').disabled,true);
-await $('cancel-revision').click();await $('retry').click();await until(()=>$('runtime').textContent==='Python runtime ready','recover timed-out invalidated operation');
+assert.equal($('runtime').textContent,'Paused');for(const id of ['case-file','new-case','example','load-example'])assert.equal($(id).disabled,true,`${id} must stay disabled until the runtime is ready`);assert.equal($('retry').hidden,false);assert.equal($('accept').disabled,true);
+await $('cancel-revision').click();await $('retry').click();await until(()=>$('runtime').textContent==='Ready','recover timed-out invalidated operation');
 heldReview.worker.send({id:heldReview.message.id,type:'result',case:bundle,result:{decision:'ACCEPT',resolution_accepted:true}});assert.equal($('decision-title').textContent,'Not reviewed');
 await $('run').click();await until(()=>$('decision-title').textContent==='More evidence required','fresh review after recovery');
 // A newer delayed selection must discard an older queued import, not briefly commit it.

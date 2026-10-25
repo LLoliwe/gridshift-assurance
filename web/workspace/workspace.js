@@ -1,11 +1,12 @@
 import {EngineController} from './engine-controller.js';
+import LIMITS from './intake-limits.json' with {type:'json'};
 import {WorkspaceState,copy,diff,blankPackage,blankRecord,blankCoverage,RECORD_FIELDS,SCOPE_FIELDS,evidenceGuide} from './workspace-state.js';
 const $=id=>document.getElementById(id);
 const el=(tag,value,cls)=>{const node=document.createElement(tag);if(value!==undefined)node.textContent=String(value??'');if(cls)node.className=cls;return node;};
 const state=new WorkspaceState();let engine,pendingToken=null,waitingOpen=null,openSequence=0,loadingFile=false,operationTimer=null,selectedRecord=0,downloadKind=null,creatingCase=false;
 const display=value=>typeof value==='string'?value:JSON.stringify(value);
 const metric=(label,report)=>{const node=el('div',undefined,'metric result-metric');node.append(el('span',label),el('strong',`${report.emissions_tco2e} tCO₂e`),el('p',`${report.energy_mwh} MWh · conditional inventory estimate`));return node;};
-function notice(message){$('notice').textContent=message;}
+function notice(message,detail=null){$('notice').textContent=message;$('notice-details').hidden=!detail;$('notice-details').open=false;$('notice-trace').textContent=detail||'';}
 function buttons(){
  const ready=engine?.state==='ready'&&!loadingFile&&!waitingOpen&&!state.pending;
  const existing=Boolean(state.case),draft=Boolean(state.draft);
@@ -17,6 +18,9 @@ function buttons(){
  $('retry').hidden=!['failed','suspended'].includes(engine?.state);
  $('confirm').disabled=!ready;
  $('save-revision').disabled=loadingFile;
+ const runtimeUp=['ready','checking'].includes(engine?.state);
+ for(const id of ['case-file','new-case','example','load-example'])$(id).disabled=!runtimeUp;
+ $('case-file').closest?.('label')?.classList.toggle('disabled',!runtimeUp);
 }
 function clearResult(message='Declarations changed. Rerun before using a result or confirming a correction.'){
  state.result=null;state.last=null;state.confirmed=false;$('confirm').checked=false;$('acceptance').hidden=true;$('result').replaceChildren();$('decision-title').textContent='Not reviewed';$('decision-status').textContent='Rerun required';$('decision-status').dataset.state='stale';$('decision-label').textContent=message;$('proposal-hash').textContent='';renderGuide();if(state.case)renderEvidence();buttons();
@@ -102,7 +106,7 @@ function beginIntake(){
  waitingOpen=null;loadingFile=true;engine.invalidate();state.invalidate();pendingToken=null;clearResult('Opening another case. Previous evidence remains visible, but its review and approval are invalidated.');notice('Reading a new case. Earlier responses are ignored immediately; the preserved evidence remains until strict intake succeeds.');renderHistory();buttons();
 }
 async function readFile(file){
- const sequence=++openSequence;if(!file)return;beginIntake();if(file.size===0||file.size>768*1024){loadingFile=false;notice('Choose a file between 1 byte and 768 KiB. Raw input packages are limited to 64 KiB. Previous evidence is intact; rerun its review before use.');buttons();return;}
+ const sequence=++openSequence;if(!file)return;beginIntake();if(file.size===0||file.size>LIMITS.envelope_limit_bytes){loadingFile=false;notice(LIMITS.open_size_message+' Raw input packages are limited to 64 KiB. Previous evidence is intact; rerun its review before use.');buttons();return;}
 try{await openBytes(new Uint8Array(await file.arrayBuffer()),sequence);}catch(error){if(sequence===openSequence){loadingFile=false;notice(String(error.message));buttons();}}
 }
 function download(content,name,type){const url=URL.createObjectURL(new Blob([content],{type})),a=el('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);}
@@ -125,14 +129,18 @@ function received(message){
  }
  downloadKind=null;buttons();if(message.operation==='review'||message.operation==='accept')$('decision-title').focus({preventScroll:false});
 }
+const LOADING_NOTICE='Getting the calculator ready. Opening a case unlocks in a moment.',READY_NOTICE='Open a declared case, or enter the original report and evidence using guided fields.';
+const RUNTIME_LABELS={loading:'Loading calculator…',ready:'Ready',checking:'Checking',failed:'Not available',suspended:'Paused'};
 function runtime(next){
- $('runtime').textContent={loading:'Preparing pinned Python runtime',ready:'Python runtime ready',checking:'Python is checking',failed:'Runtime unavailable',suspended:'Runtime paused'}[next]||next;
+ // Plain status chip. Open actions stay disabled until the pinned runtime is ready.
+ $('runtime').textContent=RUNTIME_LABELS[next]||next;$('runtime').dataset.state=next;
+ if(next==='ready'&&$('notice').textContent===LOADING_NOTICE)notice(READY_NOTICE);
  if(next==='ready'){clearTimeout(operationTimer);queueMicrotask(flushOpen);}buttons();
 }
-function failure({phase,message}){
+function failure({phase,message,detail=null}){
  clearTimeout(operationTimer);const opening=pendingToken?.operation==='open';state.pending=null;pendingToken=null;downloadKind=null;
  if(!opening){state.invalidate();clearResult('No current result. Retry or rerun before relying on this case.');}
- notice(`${opening?'Case was not opened; the previous case is intact, but rerun is required. ':''}${message}`);buttons();
+ notice(`${opening?'Case was not opened; the previous case is intact, but rerun is required. ':''}${message}`,detail);buttons();
 }
 const labels={package_id:'Case identifier',record_id:'Record identifier',source_id:'Source identifier',entity_id:'Entity identifier',site_id:'Site identifier',meter_id:'Meter identifier',country:'Country code',period_start:'Period starts (YYYY-MM-DD)',period_end:'Period ends, exclusive (YYYY-MM-DD)',quantity:'Exact quantity (decimal text)',unit:'Unit',source_status:'Declared source status',source_note:'Source note or document reference',action:'Declared relationship',target_record_id:'Explicit target record identifier',energy_mwh:'Reported energy (MWh, decimal text)',emissions_tco2e:'Reported emissions (tCO₂e, decimal text)',claim_type:'Report claim',factor_id:'Factor identifier',data_year:'Data year (integer)',boundary:'Accounting boundary',activity_statuses:'All declared activity statuses',limitations:'All report limitations'};
 const choiceLabels={SYNTHETIC:'Invented / synthetic evidence',UNVERIFIED_USER_INPUT:'Unverified source declaration',ORIGINAL:'Original record (no target)',FULL_REPLACEMENT:'Fully replaces another record',FULL_VOID:'Fully voids an original record',ZA:'South Africa (ZA)',MWh:'Megawatt-hours (MWh)',kWh:'Kilowatt-hours (kWh)'};

@@ -232,3 +232,15 @@ footer { margin-top: 28px; padding-top: 18px; border-top: 1px solid var(--line);
   .case-heading { flex-wrap: wrap; gap: 8px; }
   .acceptance { padding-inline: 12px; }
 }
+
+/* Open actions wait for the runtime: one visible disabled style for every open action. */
+.file-label.disabled,
+.toolbar button:disabled,
+.toolbar select:disabled { opacity: .55; cursor: not-allowed; }
+.file-label.disabled input { cursor: not-allowed; }
+/* Runtime status is plain text, not a pill. */
+.status-chip#runtime { border: 0; background: none; padding: 4px 0; border-radius: 0; color: #354e60; }
+.status-chip#runtime[data-state="ready"] { color: #23573f; }
+.status-chip#runtime[data-state="failed"], .status-chip#runtime[data-state="suspended"] { color: #87331f; }
+.notice-details { margin: .25rem 0 0; font-size: .85rem; }
+.notice-details pre { max-height: 12rem; overflow: auto; white-space: pre-wrap; word-break: break-word; }

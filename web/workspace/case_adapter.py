@@ -7,6 +7,7 @@ from hashlib import sha256
 from pathlib import Path
 import json
 from reconciliation import load_package, reconcile_package, accept_proposal, canonical
+from quarantine_state import refuse_if_quarantined  # AC-5 hard guard; logic lives in quarantine.py
 
 VERSION = 'gridshift.workspace.case.v1'
 RAW_LIMIT = 64 * 1024
@@ -14,6 +15,9 @@ ENVELOPE_LIMIT = 768 * 1024
 REQUEST_LIMIT = 2 * 1024 * 1024
 HISTORY_LIMIT = 100
 INTAKE_PATH = Path('/tmp/gridshift-workspace-intake.json')
+# One shared source for size limits and their wording, also read by the JS worker and UI.
+LIMITS = json.loads(Path(__file__).with_name('intake-limits.json').read_text(encoding='utf-8'))
+assert (LIMITS['envelope_limit_bytes'], LIMITS['raw_limit_bytes']) == (ENVELOPE_LIMIT, RAW_LIMIT)
 
 
 def _require(ok, message):
@@ -23,13 +27,51 @@ def _require(ok, message):
 
 def _load(raw, limit):
     _require(isinstance(raw, bytes) and 0 < len(raw) <= limit,
-             f'Input must contain 1–{limit} UTF-8 bytes.')
+             LIMITS['open_size_message'] if limit == ENVELOPE_LIMIT else LIMITS['original_size_message'])
     # Fixed internal path, never derived from user content. The worker is serialized.
     INTAKE_PATH.write_bytes(raw)
     try:
-        return load_package(INTAKE_PATH)
+        value = load_package(INTAKE_PATH)
     finally:
         INTAKE_PATH.unlink(missing_ok=True)
+    _portable(value, '$')
+    return value
+
+
+SAFE_INTEGER = 2 ** 53 - 1
+
+
+def _portable(value, path):
+    # The browser keeps the case as JavaScript values between calls. JSON floats
+    # (2024.0 -> 2024) and integers beyond 2^53-1 do not survive that boundary
+    # exactly, so refuse them at intake in every runtime instead of opening a case
+    # that later conflicts with its own raw bytes. Exact quantities are decimal strings.
+    if isinstance(value, bool) or value is None or isinstance(value, str):
+        return
+    _require(not isinstance(value, float), _number_advice(path, 'is a JSON float or exponent form'))
+    if isinstance(value, int):
+        _require(-SAFE_INTEGER <= value <= SAFE_INTEGER,
+                 _number_advice(path, 'is a JSON integer outside the exactly portable range ±(2^53−1) '
+                                '(a JavaScript transport limit of the browser workspace, not a limit of the accounting)'))
+    elif isinstance(value, dict):
+        for key, item in value.items():
+            _portable(item, f'{path}.{key}')
+    elif isinstance(value, list):
+        for index, item in enumerate(value):
+            _portable(item, f'{path}[{index}]')
+
+
+def _number_advice(path, problem):
+    # Field-specific advice only; the refusal itself is unchanged. data_year must stay
+    # the JSON integer 2024: quoting it ("2024") is not accepted by the engine policy.
+    tail = ' Numbers are not coerced; this case was not opened and the original input was not changed.'
+    if path.endswith('.data_year'):
+        return (f'data_year at {path} {problem}. It must be the JSON integer 2024, written without a decimal point, '
+                'exponent or quotes (not 2024.0, 2.024e3 or "2024").' + tail)
+    if path.rsplit('.', 1)[-1] in ('quantity', 'energy_mwh', 'emissions_tco2e'):
+        return f'Quantity at {path} {problem}. Exact quantities must be quoted decimal strings such as "100".' + tail
+    return (f'JSON number at {path} {problem}. No field of this schema needs such a number, and it cannot be '
+            'carried exactly through the browser working copy.' + tail)
 
 
 def _same(a, b):
@@ -104,6 +146,7 @@ def _clear_resolutions(case, reason):
 def open_case(raw):
     """Strict raw UTF-8 intake. Imported cached decisions never become current."""
     parsed = _load(raw, ENVELOPE_LIMIT)
+    refuse_if_quarantined(parsed)
     if isinstance(parsed, dict) and parsed.get('schema_version') == VERSION:
         case = _validate_case(parsed)
         case['cached_review'] = None
@@ -123,6 +166,7 @@ def open_case(raw):
 
 def execute(request):
     _require(isinstance(request, dict), 'Workspace request must be an object.')
+    refuse_if_quarantined(request)
     _require(len(canonical(request).encode('utf-8')) <= REQUEST_LIMIT, 'Workspace request exceeds 2 MiB.')
     operation = request.get('operation')
     expected = {'operation', 'case'}

@@ -1,0 +1,303 @@
+{
+ "schema": "gridshift.laneb.e1.expected.v1",
+ "factor_tco2e_per_mwh": "0.960",
+ "authorship": "BUILDER_AUTHORED_FROM_WRITTEN_POLICY_NOT_INDEPENDENT",
+ "cases": {
+  "E1-C01": {
+   "family": "F1_REPORT_TOTAL_MISMATCH",
+   "decision": "CORRECT",
+   "primary_reason": "REPORT_TOTAL_MISMATCH",
+   "note": "Two complete meters; report total differs from the sum.",
+   "energy_mwh": "120",
+   "emissions_tco2e": "115.2"
+  },
+  "E1-C02": {
+   "family": "F1_REPORT_TOTAL_MISMATCH",
+   "decision": "CORRECT",
+   "primary_reason": "REPORT_TOTAL_MISMATCH",
+   "note": "Two complete meters; report total differs from the sum.",
+   "energy_mwh": "100",
+   "emissions_tco2e": "96"
+  },
+  "E1-C03": {
+   "family": "F1_REPORT_TOTAL_MISMATCH",
+   "decision": "CORRECT",
+   "primary_reason": "REPORT_TOTAL_MISMATCH",
+   "note": "Two complete meters; report total differs from the sum.",
+   "energy_mwh": "12.75",
+   "emissions_tco2e": "12.24"
+  },
+  "E1-C04": {
+   "family": "F1_REPORT_TOTAL_MISMATCH",
+   "decision": "CORRECT",
+   "primary_reason": "REPORT_TOTAL_MISMATCH",
+   "note": "Two complete meters; report total differs from the sum.",
+   "energy_mwh": "301",
+   "emissions_tco2e": "288.96"
+  },
+  "E1-C05": {
+   "family": "F2_EXPLICIT_FULL_REPLACEMENT",
+   "decision": "CORRECT",
+   "primary_reason": "SUPPORTED_LINEAGE_CORRECTION",
+   "note": "B explicitly fully replaces A (same scope and interval); report used A.",
+   "energy_mwh": "100",
+   "emissions_tco2e": "96"
+  },
+  "E1-C06": {
+   "family": "F2_EXPLICIT_FULL_REPLACEMENT",
+   "decision": "CORRECT",
+   "primary_reason": "SUPPORTED_LINEAGE_CORRECTION",
+   "note": "B explicitly fully replaces A (same scope and interval); report used A.",
+   "energy_mwh": "65",
+   "emissions_tco2e": "62.4"
+  },
+  "E1-C07": {
+   "family": "F2_EXPLICIT_FULL_REPLACEMENT",
+   "decision": "CORRECT",
+   "primary_reason": "SUPPORTED_LINEAGE_CORRECTION",
+   "note": "B explicitly fully replaces A (same scope and interval); report used A.",
+   "energy_mwh": "10.1",
+   "emissions_tco2e": "9.696"
+  },
+  "E1-C08": {
+   "family": "F2_EXPLICIT_FULL_REPLACEMENT",
+   "decision": "CORRECT",
+   "primary_reason": "SUPPORTED_LINEAGE_CORRECTION",
+   "note": "B explicitly fully replaces A (same scope and interval); report used A.",
+   "energy_mwh": "391",
+   "emissions_tco2e": "375.36"
+  },
+  "E1-C09": {
+   "family": "F3_EXPLICIT_VOID_OF_DUPLICATE",
+   "decision": "CORRECT",
+   "primary_reason": "SUPPORTED_LINEAGE_CORRECTION",
+   "note": "V explicitly voids duplicate original X; report counted both.",
+   "energy_mwh": "70",
+   "emissions_tco2e": "67.2"
+  },
+  "E1-C10": {
+   "family": "F3_EXPLICIT_VOID_OF_DUPLICATE",
+   "decision": "CORRECT",
+   "primary_reason": "SUPPORTED_LINEAGE_CORRECTION",
+   "note": "V explicitly voids duplicate original X; report counted both.",
+   "energy_mwh": "33",
+   "emissions_tco2e": "31.68"
+  },
+  "E1-C11": {
+   "family": "F3_EXPLICIT_VOID_OF_DUPLICATE",
+   "decision": "CORRECT",
+   "primary_reason": "SUPPORTED_LINEAGE_CORRECTION",
+   "note": "V explicitly voids duplicate original X; report counted both.",
+   "energy_mwh": "8.25",
+   "emissions_tco2e": "7.92"
+  },
+  "E1-C12": {
+   "family": "F4_KWH_UNIT_TRAP",
+   "decision": "CORRECT",
+   "primary_reason": "REPORT_TOTAL_MISMATCH",
+   "note": "Record is in kWh; the report misreads the unit.",
+   "energy_mwh": "50",
+   "emissions_tco2e": "48"
+  },
+  "E1-C13": {
+   "family": "F4_KWH_UNIT_TRAP",
+   "decision": "CORRECT",
+   "primary_reason": "REPORT_TOTAL_MISMATCH",
+   "note": "Record is in kWh; the report misreads the unit.",
+   "energy_mwh": "1.25",
+   "emissions_tco2e": "1.2"
+  },
+  "E1-C14": {
+   "family": "F4_KWH_UNIT_TRAP",
+   "decision": "CORRECT",
+   "primary_reason": "REPORT_TOTAL_MISMATCH",
+   "note": "Record is in kWh; the report misreads the unit.",
+   "energy_mwh": "0.999",
+   "emissions_tco2e": "0.95904"
+  },
+  "E1-C15": {
+   "family": "F5_SPLIT_PERIOD_PARTIAL_COUNT",
+   "decision": "CORRECT",
+   "primary_reason": "REPORT_TOTAL_MISMATCH",
+   "note": "Two contiguous half-year records; report counts one half or errs.",
+   "energy_mwh": "100",
+   "emissions_tco2e": "96"
+  },
+  "E1-C16": {
+   "family": "F5_SPLIT_PERIOD_PARTIAL_COUNT",
+   "decision": "CORRECT",
+   "primary_reason": "REPORT_TOTAL_MISMATCH",
+   "note": "Two contiguous half-year records; report counts one half or errs.",
+   "energy_mwh": "21",
+   "emissions_tco2e": "20.16"
+  },
+  "E1-C17": {
+   "family": "F5_SPLIT_PERIOD_PARTIAL_COUNT",
+   "decision": "CORRECT",
+   "primary_reason": "REPORT_TOTAL_MISMATCH",
+   "note": "Two contiguous half-year records; report counts one half or errs.",
+   "energy_mwh": "3",
+   "emissions_tco2e": "2.88"
+  },
+  "E1-C18": {
+   "family": "F6_REPLACEMENT_CHAIN",
+   "decision": "CORRECT",
+   "primary_reason": "SUPPORTED_LINEAGE_CORRECTION",
+   "note": "C fully replaces B, which fully replaced A; report used the intermediate B.",
+   "energy_mwh": "95",
+   "emissions_tco2e": "91.2"
+  },
+  "E1-C19": {
+   "family": "F6_REPLACEMENT_CHAIN",
+   "decision": "CORRECT",
+   "primary_reason": "SUPPORTED_LINEAGE_CORRECTION",
+   "note": "C fully replaces B, which fully replaced A; report used the intermediate B.",
+   "energy_mwh": "25",
+   "emissions_tco2e": "24"
+  },
+  "E1-C20": {
+   "family": "F6_REPLACEMENT_CHAIN",
+   "decision": "CORRECT",
+   "primary_reason": "SUPPORTED_LINEAGE_CORRECTION",
+   "note": "C fully replaces B, which fully replaced A; report used the intermediate B.",
+   "energy_mwh": "6",
+   "emissions_tco2e": "5.76"
+  },
+  "E1-W01": {
+   "family": "W1_INCOMPLETE_COVERAGE",
+   "decision": "WITHHOLD",
+   "primary_reason": "COVERAGE_UNRESOLVED",
+   "note": "Declared meter M2 has no record; missing is not zero."
+  },
+  "E1-W02": {
+   "family": "W1_INCOMPLETE_COVERAGE",
+   "decision": "WITHHOLD",
+   "primary_reason": "COVERAGE_UNRESOLVED",
+   "note": "Second half-year missing."
+  },
+  "E1-W03": {
+   "family": "W2_UNEXPLAINED_OVERLAP",
+   "decision": "WITHHOLD",
+   "primary_reason": "AMBIGUOUS_OVERLAP",
+   "note": "Two originals, same meter and period, no lineage (possible duplicate, not assumed)."
+  },
+  "E1-W04": {
+   "family": "W2_UNEXPLAINED_OVERLAP",
+   "decision": "WITHHOLD",
+   "primary_reason": "AMBIGUOUS_OVERLAP",
+   "note": "Periods overlap by one month."
+  },
+  "E1-W05": {
+   "family": "W3_CONFLICTING_SUCCESSORS",
+   "decision": "WITHHOLD",
+   "primary_reason": "CONFLICTING_SUCCESSORS",
+   "note": "Two documents each claim to replace A."
+  },
+  "E1-W06": {
+   "family": "W3_CONFLICTING_SUCCESSORS",
+   "decision": "WITHHOLD",
+   "primary_reason": "CONFLICTING_SUCCESSORS",
+   "note": "Two documents each claim to replace A."
+  },
+  "E1-W07": {
+   "family": "W4_PARTIAL_OR_CROSS_SCOPE",
+   "decision": "WITHHOLD",
+   "primary_reason": "PARTIAL_OR_CROSS_SCOPE",
+   "note": "Replacement covers only half of the original interval."
+  },
+  "E1-W08": {
+   "family": "W4_PARTIAL_OR_CROSS_SCOPE",
+   "decision": "WITHHOLD",
+   "primary_reason": "PARTIAL_OR_CROSS_SCOPE",
+   "note": "Replacement names a different meter."
+  },
+  "E1-W09": {
+   "family": "W5_MISSING_TARGET",
+   "decision": "WITHHOLD",
+   "primary_reason": "MISSING_TARGET",
+   "note": "Replacement references a record that was not supplied."
+  },
+  "E1-W10": {
+   "family": "W6_NON_ENERGY_UNIT",
+   "decision": "WITHHOLD",
+   "primary_reason": "SOURCE_NOT_SUPPORTED",
+   "note": "A currency amount is not energy."
+  },
+  "E1-W11": {
+   "family": "W7_WRONG_DATA_YEAR",
+   "decision": "WITHHOLD",
+   "primary_reason": "REPORT_FACTOR_MISMATCH",
+   "note": "Report declares data year 2023 (a valid JSON integer) against the 2024 factor."
+  },
+  "E1-W12": {
+   "family": "W8_LIMITATION_DROPPED",
+   "decision": "WITHHOLD",
+   "primary_reason": "LIMITATIONS_LOSS",
+   "note": "A required limitation was dropped from the report."
+  },
+  "E1-A01": {
+   "family": "A1_CONSISTENT_SINGLE_METER",
+   "decision": "ACCEPT",
+   "primary_reason": null,
+   "note": "Consistent single complete meter.",
+   "energy_mwh": "100",
+   "emissions_tco2e": "96"
+  },
+  "E1-A02": {
+   "family": "A1_CONSISTENT_SINGLE_METER",
+   "decision": "ACCEPT",
+   "primary_reason": null,
+   "note": "Consistent single complete meter.",
+   "energy_mwh": "7.125",
+   "emissions_tco2e": "6.84"
+  },
+  "E1-A03": {
+   "family": "A2_CONSISTENT_TWO_METERS",
+   "decision": "ACCEPT",
+   "primary_reason": null,
+   "note": "Consistent two complete meters.",
+   "energy_mwh": "120",
+   "emissions_tco2e": "115.2"
+  },
+  "E1-A04": {
+   "family": "A2_CONSISTENT_TWO_METERS",
+   "decision": "ACCEPT",
+   "primary_reason": null,
+   "note": "Consistent two complete meters.",
+   "energy_mwh": "0.75",
+   "emissions_tco2e": "0.72"
+  },
+  "E1-A05": {
+   "family": "A3_CONSISTENT_KWH",
+   "decision": "ACCEPT",
+   "primary_reason": null,
+   "note": "kWh record correctly converted in the report.",
+   "energy_mwh": "50",
+   "emissions_tco2e": "48"
+  },
+  "E1-A06": {
+   "family": "A3_CONSISTENT_KWH",
+   "decision": "ACCEPT",
+   "primary_reason": null,
+   "note": "kWh record correctly converted in the report.",
+   "energy_mwh": "1.25",
+   "emissions_tco2e": "1.2"
+  },
+  "E1-A07": {
+   "family": "A4_CONSISTENT_SPLIT_PERIOD",
+   "decision": "ACCEPT",
+   "primary_reason": null,
+   "note": "Contiguous half-years, consistent report.",
+   "energy_mwh": "100",
+   "emissions_tco2e": "96"
+  },
+  "E1-A08": {
+   "family": "A4_CONSISTENT_SPLIT_PERIOD",
+   "decision": "ACCEPT",
+   "primary_reason": null,
+   "note": "Contiguous half-years, consistent report.",
+   "energy_mwh": "3",
+   "emissions_tco2e": "2.88"
+  }
+ }
+}
