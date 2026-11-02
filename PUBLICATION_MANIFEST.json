@@ -58,8 +58,8 @@
       "bytes": 6642
     },
     "docs/CLIMATE_EXTENSION.md": {
-      "sha256": "2af606ad29fa560f881fe749cba566321224e0dde11cfb98a9a18f69e548b7e3",
-      "bytes": 8334
+      "sha256": "a250e53e10c58cea86fc5c8aa945f7d97d9741add6bd978a4b6a7344b054ccc8",
+      "bytes": 8419
     },
     "docs/FACTOR_REVIEW.md": {
       "sha256": "4a047bbb9843faee49724677980e065e3032d5073c241f5b572a21cc03bc32c6",
@@ -94,8 +94,8 @@
       "bytes": 10009
     },
     "src/emissions.py": {
-      "sha256": "82f8e3e9a99f6fa354fa3be097d764e475159ff8bbd3c300733a1215e0a85655",
-      "bytes": 16461
+      "sha256": "c161c93e400929071d54621950a91da244a4376e286968e20838e15d80d638de",
+      "bytes": 17541
     },
     "src/emissions_report.py": {
       "sha256": "01dcc02b4e3dba3eb0141215de3ce54a3b45c4205f2aabdbdac5459ab18dac74",
@@ -114,16 +114,16 @@
       "bytes": 25879
     },
     "tests/test_emissions_cli.py": {
-      "sha256": "73ace83344a80060907583d85af2790a19d224014cc2ab726abe73128c39a7d2",
-      "bytes": 4735
+      "sha256": "78811607ec16ac8a549f787a516a59a7585a95c19eb2654a20d4399d4719db6c",
+      "bytes": 4752
     },
     "tests/test_emissions_limits.py": {
       "sha256": "d65a445770b9c3c39388262c6f260b4bd6844b1e6d02dcbd906edfa9018012ed",
       "bytes": 2921
     },
     "tests/test_emissions_preflight.py": {
-      "sha256": "ad95dc8b5a505e9a6cc06e2575e6b80d788f3496bab4629bd5054a5c962ddc93",
-      "bytes": 2587
+      "sha256": "05573f45cf51c89db69d736a2d9d92dd61e8d05ea00e90f0eed7706bd81319ee",
+      "bytes": 3734
     },
     "tests/test_emissions_report.py": {
       "sha256": "95e3d0e458872985160eab156e7e2e905099a113632cedfa78e311474c0fad26",
