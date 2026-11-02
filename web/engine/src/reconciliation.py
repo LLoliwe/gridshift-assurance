@@ -13,6 +13,7 @@ SCOPE=('entity_id','site_id','meter_id','country','period_start','period_end')
 RECORD=set(SCOPE)|{'record_id','source_id','quantity','unit','source_status','source_note','action','target_record_id'}
 REPORT={'claim_type','energy_mwh','emissions_tco2e','factor_id','data_year','boundary','activity_statuses','limitations'}
 LIMITS=['NOT_AN_INDEPENDENT_VERIFICATION','NOT_BLOCKCHAIN','NOT_MEASURED_SAVINGS','EXCLUDES_SCOPE3_T_AND_D','ANNUAL_AVERAGE_NOT_TIME_OF_USE','ACTIVITY_NOT_VERIFIED','PUBLISHED_FACTOR_INPUT_RECONCILIATION_UNRESOLVED','MARKET_BASED_NOT_COMPUTED','ORGANIZATIONAL_BOUNDARY_NOT_REVIEWED','NOT_FULL_SCOPE2_COMPLIANCE']
+REVIEWER_ATTESTATION='I reviewed the included/excluded records and accept this exact proposal as the declared reviewer.'
 
 class PolicyError(ValueError):
     def __init__(self,code,message,ids=()):self.code=code;self.ids=list(ids);super().__init__(message)
@@ -121,13 +122,18 @@ def _run(p):
     correction=bool(excluded) or claimed_energy!=energy or claimed_emissions!=emissions
     proposal={'policy':POLICY,'source_package_sha256':source_digest(p),'included_record_ids':included,'excluded_record_ids':excluded,'proposed_report':proposed,'trace':trace}
     proposal_hash=digest(proposal) if correction else None
-    resolution_accepted=False
+    resolution_accepted=False;reviewer_attestation=None
     if p['resolutions']:
-        r=p['resolutions'][0];fields(r,{'action','proposal_sha256','reviewer_id','source_status'},'resolutions[0]');text(r['reviewer_id'],'reviewer_id')
+        r=p['resolutions'][0];legacy_fields={'action','proposal_sha256','reviewer_id','source_status'}
+        fields(r,legacy_fields|({'reviewer_attestation'} if isinstance(r,dict) and 'reviewer_attestation' in r else set()),'resolutions[0]')
+        text(r['reviewer_id'],'reviewer_id')
+        if 'reviewer_attestation' in r:
+            if r['reviewer_attestation']!=REVIEWER_ATTESTATION:fail('INVALID_REVIEWER_ATTESTATION','Reviewer attestation must exactly state that included and excluded records were reviewed and this proposal accepted.')
+            reviewer_attestation=r['reviewer_attestation']
         if not correction or r['action']!='ACCEPT_PROPOSAL' or r['proposal_sha256']!=proposal_hash or r['source_status']!='UNVERIFIED_USER_INPUT':fail('STALE_OR_UNSUPPORTED_RESOLUTION','Only explicit acceptance of this exact current proposal is supported; no bare override or stale approval.')
         resolution_accepted=True
     decision='CORRECT' if correction and not resolution_accepted else 'ACCEPT'
-    return {'schema_version':'gridshift.reconciliation.result.v1','policy':POLICY,'decision':decision,'decision_label':'Accepted within this calculation policy' if decision=='ACCEPT' else 'Correction proposed; reviewer acceptance required','source_package_sha256':source_digest(p),'included_record_ids':included,'excluded_record_ids':excluded,'proposed_report':proposed if correction else None,'accepted_report':proposed if decision=='ACCEPT' else None,'proposal_sha256':proposal_hash,'resolution_accepted':resolution_accepted,'trace':trace,'discrepancy':discrepancy,'findings':([{'code':'SUPPORTED_LINEAGE_CORRECTION','message':'Explicit supported lineage changes the accepted record set; original evidence retained.','record_ids':excluded}] if excluded else [])+([{'code':'REPORT_TOTAL_MISMATCH','message':'Reported energy or emissions differ from the uniquely supported record set.','record_ids':included}] if claimed_energy!=energy or claimed_emissions!=emissions else []),'required_evidence':[],'limitations':deepcopy(LIMITS),'activity_statuses':statuses,'coverage_scope':'DECLARED_PACKAGE_ONLY_NOT_ORGANIZATIONAL_COMPLETENESS','reviewer_identity':'SELF_REPORTED_NOT_AUTHENTICATED','factor':deepcopy(CURATED_FACTOR),'additional_report_limitations':'UNVERIFIED_USER_ASSERTIONS_NOT_SCOPE_OVERRIDES'}
+    return {'schema_version':'gridshift.reconciliation.result.v1','policy':POLICY,'decision':decision,'decision_label':'Accepted within this calculation policy' if decision=='ACCEPT' else 'Correction proposed; reviewer acceptance required','source_package_sha256':source_digest(p),'included_record_ids':included,'excluded_record_ids':excluded,'proposed_report':proposed if correction else None,'accepted_report':proposed if decision=='ACCEPT' else None,'proposal_sha256':proposal_hash,'resolution_accepted':resolution_accepted,'reviewer_attestation':reviewer_attestation,'trace':trace,'discrepancy':discrepancy,'findings':([{'code':'SUPPORTED_LINEAGE_CORRECTION','message':'Explicit supported lineage changes the accepted record set; original evidence retained.','record_ids':excluded}] if excluded else [])+([{'code':'REPORT_TOTAL_MISMATCH','message':'Reported energy or emissions differ from the uniquely supported record set.','record_ids':included}] if claimed_energy!=energy or claimed_emissions!=emissions else []),'required_evidence':[],'limitations':deepcopy(LIMITS),'activity_statuses':statuses,'coverage_scope':'DECLARED_PACKAGE_ONLY_NOT_ORGANIZATIONAL_COMPLETENESS','reviewer_identity':'SELF_REPORTED_NOT_AUTHENTICATED','factor':deepcopy(CURATED_FACTOR),'additional_report_limitations':'UNVERIFIED_USER_ASSERTIONS_NOT_SCOPE_OVERRIDES'}
 
 def reconcile_package(package):
     """Fail closed, retain no invented totals, and never mutate caller evidence."""
@@ -135,13 +141,14 @@ def reconcile_package(package):
         if len(canonical(package).encode())>2*1024*1024:fail('INPUT_LIMIT','Package exceeds 2 MiB.')
         return _run(package)
     except (PolicyError,ValueError,TypeError,RecursionError) as e:
-        return {'schema_version':'gridshift.reconciliation.result.v1','policy':POLICY,'decision':'WITHHOLD','decision_label':'Withheld pending specific evidence','proposed_report':None,'accepted_report':None,'proposal_sha256':None,'findings':[{'code':getattr(e,'code','INVALID_INPUT'),'message':str(e),'record_ids':getattr(e,'ids',[])}],'required_evidence':[str(e)],'issue_completeness':'FIRST_BLOCKER_ONLY_ADDITIONAL_ISSUES_MAY_EMERGE_NOT_MINIMALITY_PROOF','limitations':deepcopy(LIMITS),'coverage_scope':'NOT_ESTABLISHED','reviewer_identity':'SELF_REPORTED_NOT_AUTHENTICATED','factor':deepcopy(CURATED_FACTOR),'additional_report_limitations':'UNVERIFIED_USER_ASSERTIONS_NOT_SCOPE_OVERRIDES'}
+        return {'schema_version':'gridshift.reconciliation.result.v1','policy':POLICY,'decision':'WITHHOLD','decision_label':'Withheld pending specific evidence','proposed_report':None,'accepted_report':None,'proposal_sha256':None,'reviewer_attestation':None,'findings':[{'code':getattr(e,'code','INVALID_INPUT'),'message':str(e),'record_ids':getattr(e,'ids',[])}],'required_evidence':[str(e)],'issue_completeness':'FIRST_BLOCKER_ONLY_ADDITIONAL_ISSUES_MAY_EMERGE_NOT_MINIMALITY_PROOF','limitations':deepcopy(LIMITS),'coverage_scope':'NOT_ESTABLISHED','reviewer_identity':'SELF_REPORTED_NOT_AUTHENTICATED','factor':deepcopy(CURATED_FACTOR),'additional_report_limitations':'UNVERIFIED_USER_ASSERTIONS_NOT_SCOPE_OVERRIDES'}
 
-def accept_proposal(package,proposal_sha256,reviewer_id):
+def accept_proposal(package,proposal_sha256,reviewer_id,reviewed_records=False):
     result=reconcile_package(package)
     if result['decision']!='CORRECT' or result['proposal_sha256']!=proposal_sha256:raise ValueError('No matching current correction proposal to accept.')
+    if reviewed_records is not True:raise ValueError('Acceptance requires explicit confirmation that included and excluded records were reviewed.')
     text(reviewer_id,'reviewer_id');revised=deepcopy(package)
-    revised['resolutions']=[{'action':'ACCEPT_PROPOSAL','proposal_sha256':proposal_sha256,'reviewer_id':reviewer_id,'source_status':'UNVERIFIED_USER_INPUT'}]
+    revised['resolutions']=[{'action':'ACCEPT_PROPOSAL','proposal_sha256':proposal_sha256,'reviewer_id':reviewer_id,'source_status':'UNVERIFIED_USER_INPUT','reviewer_attestation':REVIEWER_ATTESTATION}]
     return revised
 
 def export_package(package):
@@ -163,12 +170,13 @@ def main(argv=None):
     import argparse,sys
     from emissions import _write_exclusive_atomic
     parser=argparse.ArgumentParser(description='Restricted GRIDSHIFT report reconciliation; not source verification.')
-    parser.add_argument('package');parser.add_argument('--output');parser.add_argument('--accept-proposal');parser.add_argument('--reviewer')
+    parser.add_argument('package');parser.add_argument('--output');parser.add_argument('--accept-proposal');parser.add_argument('--reviewer');parser.add_argument('--confirm-reviewed-records',action='store_true',help='Record the reviewer assertion that included and excluded records were reviewed.')
     args=parser.parse_args(argv)
     try:
         if bool(args.accept_proposal)!=bool(args.reviewer):raise ValueError('Acceptance requires both exact proposal hash and reviewer identifier.')
+        if bool(args.accept_proposal)!=args.confirm_reviewed_records:raise ValueError('Acceptance requires --confirm-reviewed-records together with the exact proposal hash and reviewer identifier.')
         package=load_package(args.package)
-        if args.accept_proposal:package=accept_proposal(package,args.accept_proposal,args.reviewer)
+        if args.accept_proposal:package=accept_proposal(package,args.accept_proposal,args.reviewer,args.confirm_reviewed_records)
         output=export_package(package)
         if args.output:_write_exclusive_atomic(args.output,output)
         else:sys.stdout.write(output)
