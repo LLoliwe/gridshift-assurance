@@ -174,7 +174,12 @@ def preflight(activities, factor):
         raise ValueError('nonempty activity list required')
     if len(activities) > MAX_ACTIVITIES:
         raise ValueError('ACTIVITY_COUNT_LIMIT: at most 1000 records per batch')
-    rows, eligible = [], []
+    rows, conflict_metadata = [], []
+
+    def usable_text(value):
+        return (isinstance(value, str) and bool(value.strip()) and
+                value == value.strip() and len(value) <= 2000)
+
     for index, activity in enumerate(activities):
         identity = activity.get('activity_id') if isinstance(activity, dict) else None
         row = {'index': index, 'activity_id': identity if isinstance(identity, str) else None,
@@ -182,7 +187,6 @@ def preflight(activities, factor):
         try:
             receipt = calculate(activity, factor)
             row['activity_status'] = receipt['activity_status']
-            eligible.append(index)
         except ValueError as error:
             message = str(error)
             code = 'FACTOR_YEAR_MISMATCH' if 'FACTOR_YEAR_MISMATCH' in message else 'INVALID_INPUT'
@@ -192,16 +196,30 @@ def preflight(activities, factor):
             row['issues'].append({'code': code, 'message': message, 'action': action})
             row['issue_count'] += 1
         rows.append(row)
-    for offset, left in enumerate(eligible):
-        a = activities[left]
-        for right in eligible[offset + 1:]:
-            b = activities[right]
+
+        identity = activity.get('activity_id') if isinstance(activity, dict) else None
+        identity = identity if usable_text(identity) else None
+        meter_values = tuple(activity.get(field) for field in ('country', 'site_id', 'meter_id')) if isinstance(activity, dict) else ()
+        meter = meter_values if meter_values and all(usable_text(value) for value in meter_values) else None
+        interval = None
+        if isinstance(activity, dict) and all(usable_text(activity.get(field)) for field in ('period_start', 'period_end')):
+            try:
+                period_start, period_end = _date(activity['period_start']), _date(activity['period_end'])
+                if period_end > period_start:
+                    interval = (period_start, period_end)
+            except ValueError:
+                pass
+        conflict_metadata.append((identity, meter, interval))
+
+    for left, (identity, meter, interval) in enumerate(conflict_metadata):
+        for right in range(left + 1, len(conflict_metadata)):
+            other_identity, other_meter, other_interval = conflict_metadata[right]
             issues = []
-            if a['activity_id'] == b['activity_id']:
+            if identity is not None and identity == other_identity:
                 issues.append(('DUPLICATE_ID', 'Activity ID occurs more than once.',
                                'Resolve duplicate records against the source; do not simply rename a duplicate.'))
-            if (a['country'], a['site_id'], a['meter_id']) == (b['country'], b['site_id'], b['meter_id']):
-                if a['period_start'] < b['period_end'] and a['period_end'] > b['period_start']:
+            if meter is not None and meter == other_meter and interval and other_interval:
+                if interval[0] < other_interval[1] and interval[1] > other_interval[0]:
                     issues.append(('OVERLAPPING_PERIOD', 'Same-meter activity periods overlap.',
                                    'Reconcile meter intervals and source quantities; do not sum overlapping totals.'))
             for code, message, action in issues:

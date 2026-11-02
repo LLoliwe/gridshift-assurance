@@ -10,7 +10,7 @@ class PreflightTests(unittest.TestCase):
 
     def test_reports_every_invalid_row_without_partial_emissions_total(self):
         wrong_year = dict(ACTIVITY, activity_id='year', period_start='2026-01-01', period_end='2027-01-01')
-        bad_unit = dict(ACTIVITY, activity_id='money', unit='ZAR')
+        bad_unit = dict(ACTIVITY, activity_id='money', site_id='OTHER', unit='ZAR')
         result = self.check([ACTIVITY, wrong_year, bad_unit])
         self.assertEqual(result['status'], 'BLOCKED')
         self.assertEqual(result['input_count'], 3)
@@ -30,12 +30,31 @@ class PreflightTests(unittest.TestCase):
         for row in result['rows']:
             self.assertIn('OVERLAPPING_PERIOD', [i['code'] for i in row['issues']])
 
+    def test_overlap_is_reported_when_one_row_has_an_unrelated_invalid_field(self):
+        invalid = dict(ACTIVITY, activity_id='invalid-quantity', quantity='not-a-number')
+        valid = dict(ACTIVITY, activity_id='valid-peer')
+        result = self.check([invalid, valid])
+        self.assertEqual(result['blocked_count'], 2)
+        for index, row in enumerate(result['rows']):
+            overlap = [issue for issue in row['issues'] if issue['code'] == 'OVERLAPPING_PERIOD']
+            self.assertEqual(len(overlap), 1)
+            self.assertEqual(overlap[0]['related_index'], 1 - index)
+
     def test_duplicate_ids_across_sites_are_flagged_on_both_rows(self):
         b = dict(ACTIVITY, site_id='OTHER')
         result = self.check([ACTIVITY, b])
         self.assertEqual(result['blocked_count'], 2)
         for row in result['rows']:
             self.assertIn('DUPLICATE_ID', [i['code'] for i in row['issues']])
+
+    def test_duplicate_id_is_reported_when_one_row_has_an_unrelated_invalid_field(self):
+        invalid = dict(ACTIVITY, site_id='OTHER', quantity='not-a-number')
+        result = self.check([invalid, ACTIVITY])
+        self.assertEqual(result['blocked_count'], 2)
+        for index, row in enumerate(result['rows']):
+            duplicate = [issue for issue in row['issues'] if issue['code'] == 'DUPLICATE_ID']
+            self.assertEqual(len(duplicate), 1)
+            self.assertEqual(duplicate[0]['related_index'], 1 - index)
 
     def test_valid_batch_ready_but_does_not_claim_input_verification(self):
         result = self.check([ACTIVITY])

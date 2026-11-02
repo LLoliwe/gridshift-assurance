@@ -74,7 +74,7 @@ class EmissionsCliTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             data = json.loads((ROOT/'fixtures/demo_energy_2024.json').read_text())
             a = data['activities'][0]
-            data['activities'] += [dict(a, activity_id='wrong-year', period_start='2026-01-01', period_end='2027-01-01'), dict(a, activity_id='wrong-unit', unit='ZAR')]
+            data['activities'] += [dict(a, activity_id='wrong-year', period_start='2026-01-01', period_end='2027-01-01'), dict(a, activity_id='wrong-unit', site_id='other', unit='ZAR')]
             inp = Path(d)/'mixed.json'; inp.write_text(json.dumps(data))
             r = self.invoke('--activities', str(inp), '--preflight')
             self.assertEqual(r.returncode, 2)
