@@ -5,7 +5,7 @@ from pathlib import Path
 import unittest
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'src'))
 from emissions import CURATED_FACTOR,calculate
-from reconciliation import reconcile_package,accept_proposal,export_package
+from reconciliation import reconcile_package,accept_proposal,export_package,main
 
 def record(rid,quantity,meter='M1',action='ORIGINAL',target=None):
     return dict(record_id=rid,source_id='document-'+rid,entity_id='D1-RETAIL',site_id='SITE',meter_id=meter,country='ZA',period_start='2024-01-01',period_end='2025-01-01',quantity=quantity,unit='MWh',source_status='SYNTHETIC',source_note='Invented development evidence, not a real meter.',action=action,target_record_id=target)
@@ -20,11 +20,38 @@ class Development(unittest.TestCase):
         p=flagship();before=copy.deepcopy(p);r=reconcile_package(p)
         self.assertEqual(r['decision'],'CORRECT');self.assertEqual(r['proposed_report']['energy_mwh'],'100');self.assertEqual(r['proposed_report']['emissions_tco2e'],'96')
         self.assertEqual(r['included_record_ids'],['B','C']);self.assertEqual(r['excluded_record_ids'],['A']);self.assertEqual(p,before)
-        revised=accept_proposal(p,r['proposal_sha256'],'synthetic-reviewer')
+        revised=accept_proposal(p,r['proposal_sha256'],'synthetic-reviewer',True)
         self.assertEqual(revised['records'],p['records']);self.assertEqual(revised['report'],p['report']);self.assertEqual(reconcile_package(revised)['decision'],'ACCEPT')
     def test_remove_replacement_edge_withholds_not_guessed_total(self):
         p=flagship();p['records'][1].update(action='ORIGINAL',target_record_id=None)
         r=reconcile_package(p);self.assertEqual(r['decision'],'WITHHOLD');self.assertIsNone(r.get('proposed_report'))
+    def test_review_attestation_is_required_and_exported(self):
+        import json
+        p=flagship();proposal=reconcile_package(p)
+        with self.assertRaises(ValueError):accept_proposal(p,proposal['proposal_sha256'],'synthetic-reviewer',False)
+        accepted=accept_proposal(p,proposal['proposal_sha256'],'synthetic-reviewer',True)
+        expected='I reviewed the included/excluded records and accept this exact proposal as the declared reviewer.'
+        self.assertEqual(accepted['resolutions'][0]['reviewer_attestation'],expected)
+        result=reconcile_package(accepted);self.assertEqual(result['reviewer_attestation'],expected)
+        self.assertEqual(json.loads(export_package(accepted))['package']['resolutions'][0]['reviewer_attestation'],expected)
+    def test_legacy_acceptance_remains_readable_but_has_no_attestation(self):
+        p=flagship();proposal=reconcile_package(p)
+        accepted={'schema_version':p['schema_version'],'package_id':p['package_id'],'records':p['records'],'coverage':p['coverage'],'report':p['report'],'resolutions':[{'action':'ACCEPT_PROPOSAL','proposal_sha256':proposal['proposal_sha256'],'reviewer_id':'legacy-reviewer','source_status':'UNVERIFIED_USER_INPUT'}]}
+        result=reconcile_package(accepted)
+        self.assertEqual(result['decision'],'ACCEPT');self.assertTrue(result['resolution_accepted']);self.assertIsNone(result['reviewer_attestation'])
+    def test_cli_requires_and_exports_review_confirmation(self):
+        import json
+        from contextlib import redirect_stderr
+        from io import StringIO
+        from tempfile import TemporaryDirectory
+        p=flagship();proposal=reconcile_package(p)
+        with TemporaryDirectory() as directory:
+            source=Path(directory)/'package.json';output=Path(directory)/'accepted.json';source.write_text(json.dumps(p))
+            with redirect_stderr(StringIO()):
+                self.assertEqual(main([str(source),'--accept-proposal',proposal['proposal_sha256'],'--reviewer','cli-reviewer']),2)
+            self.assertFalse(output.exists())
+            self.assertEqual(main([str(source),'--accept-proposal',proposal['proposal_sha256'],'--reviewer','cli-reviewer','--confirm-reviewed-records','--output',str(output)]),0)
+            self.assertEqual(json.loads(output.read_text())['package']['resolutions'][0]['reviewer_attestation'],'I reviewed the included/excluded records and accept this exact proposal as the declared reviewer.')
 
 class DevelopmentBoundaries(unittest.TestCase):
     def assertWithheld(self,p):
@@ -51,7 +78,7 @@ class DevelopmentBoundaries(unittest.TestCase):
         for key,value in [('period_end','2024-12-01'),('entity_id','OTHER')]:
             p=flagship();p['records'][1][key]=value;self.assertWithheld(p)
     def test_stale_acceptance_cannot_override_new_evidence(self):
-        p=flagship();r=reconcile_package(p);q=accept_proposal(p,r['proposal_sha256'],'reviewer');q['records'][1]['quantity']='70';self.assertWithheld(q)
+        p=flagship();r=reconcile_package(p);q=accept_proposal(p,r['proposal_sha256'],'reviewer',True);q['records'][1]['quantity']='70';self.assertWithheld(q)
     def test_small_mismatch_still_corrects(self):
         p=flagship();p['records']=[record('A','100')];p['coverage']=p['coverage'][:1];p['report'].update(energy_mwh='100',emissions_tco2e='96.0001')
         r=reconcile_package(p);self.assertEqual(r['decision'],'CORRECT');self.assertFalse(r['discrepancy']['material'])

@@ -39,7 +39,7 @@ class ReconciliationAdversarialDevelopment(unittest.TestCase):
         p=clean();p['records'].append(record('EXTRA','100','M2'));self.assert_withheld(p)
         p=clean();p['records'][0].update(quantity='40',period_end='2024-07-01');p['records'].append(record('B','60'));p['records'][1]['period_start']='2024-07-01';self.assertEqual(reconcile_package(p)['decision'],'ACCEPT')
     def test_stale_acceptance_and_original_evidence_immutability(self):
-        p=flagship();before=copy.deepcopy(p);r=reconcile_package(p);accepted=accept_proposal(p,r['proposal_sha256'],'reviewer')
+        p=flagship();before=copy.deepcopy(p);r=reconcile_package(p);accepted=accept_proposal(p,r['proposal_sha256'],'reviewer',True)
         self.assertEqual(p,before);self.assertEqual(accepted['records'],before['records']);self.assertEqual(accepted['report'],before['report']);self.assertEqual(reconcile_package(accepted)['decision'],'ACCEPT')
         for section,key,value in [('report','energy_mwh','201'),('records','source_note','changed source assertion'),('coverage','period_start','2024-02-01')]:
             altered=copy.deepcopy(accepted)

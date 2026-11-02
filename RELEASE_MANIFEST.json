@@ -10,8 +10,8 @@
   "files": [
     {
       "path": "docs/RECONCILIATION.md",
-      "bytes": 4728,
-      "sha256": "f97f0fb23ec4b7a1297545a06ade45b06eb2c6b3ed4787721f7e6c46b1ba80c7"
+      "bytes": 5101,
+      "sha256": "a8890bbdb4f649a4214ba8fa1b6c996b7d690d9b1ff11b41eba8f8a216715a54"
     },
     {
       "path": "source-exhibit/DURNACOL_LIMITED_FACTS.json",
@@ -40,18 +40,18 @@
     },
     {
       "path": "src/reconciliation.py",
-      "bytes": 16490,
-      "sha256": "5f328d7f9acb4aa955ca2da64279a26dd6754a5ed93ee46c43a3ec97f87996cd"
+      "bytes": 17764,
+      "sha256": "5e24b2d8d09e59254111ec7c7734f62dc5160de2098a7f1c71f909d4c42797d5"
     },
     {
       "path": "tests/test_reconciliation_adversarial_development.py",
-      "bytes": 8402,
-      "sha256": "238c425f4c7e3a13c7ae147787ba5e5fe524dfee9ccba5ae4267089b1af39050"
+      "bytes": 8407,
+      "sha256": "c192d86fd7f95a095bcafcd20c1cd021ef3b3f81b168544749903286bf982302"
     },
     {
       "path": "tests/test_reconciliation_development.py",
-      "bytes": 7270,
-      "sha256": "c2dacfa58373c1da58541c1013d616214a94f357a7e3acb67730a53f9aa725ff"
+      "bytes": 9747,
+      "sha256": "8e6891aa85c087b257f57d9ec372c06ae8ae956284b503be42e03ec3196d8356"
     },
     {
       "path": "web/engine/fixtures/za_grid_factor_2024.json",
@@ -65,8 +65,8 @@
     },
     {
       "path": "web/engine/src/reconciliation.py",
-      "bytes": 16490,
-      "sha256": "5f328d7f9acb4aa955ca2da64279a26dd6754a5ed93ee46c43a3ec97f87996cd"
+      "bytes": 17764,
+      "sha256": "5e24b2d8d09e59254111ec7c7734f62dc5160de2098a7f1c71f909d4c42797d5"
     },
     {
       "path": "web/engine-controller.js",
@@ -95,8 +95,8 @@
     },
     {
       "path": "web/reconcile/reconcile-ui.js",
-      "bytes": 9806,
-      "sha256": "e8893b7b3a0d640fa08bee944d01b1e63b6eb91bad7e87a2f0379ae6b104a3dc"
+      "bytes": 10022,
+      "sha256": "b05024daf6e1b505eb0b28e0530795085757164ea57fb320ad5a886c29f19dfa"
     },
     {
       "path": "web/reconcile/reconcile.css",
@@ -105,8 +105,8 @@
     },
     {
       "path": "web/reconciliation-worker.js",
-      "bytes": 4217,
-      "sha256": "600d4945c8be343be17c6886a10540b2b956631568c23547bca2fd9cdacf2752"
+      "bytes": 4331,
+      "sha256": "946eedffbbce20f13ac179785c23cfa8546bf44a01c353a42d2119224a47c551"
     },
     {
       "path": "web-tests/flagship-proposal.json",
@@ -115,13 +115,13 @@
     },
     {
       "path": "web-tests/test_bridge.py",
-      "bytes": 1575,
-      "sha256": "dc719813f4f1b720e0bc458cc3348bf95aa8eaeb90454730e82e3ee64b4cb03d"
+      "bytes": 2559,
+      "sha256": "41150f3f6a220132118f542f9f3f70bf8e9988b7f90792bbbbde4568bfcd16cb"
     },
     {
       "path": "web-tests/ui-lifecycle.mjs",
-      "bytes": 6616,
-      "sha256": "fb28a7f0b818f746286b07d31b246254d60c985232962a24bfb55e351a2b82c7"
+      "bytes": 6959,
+      "sha256": "b339f58d10e34df1787bbf36514d5b874282dbe47117ecacf74110e6eb6f8a72"
     }
   ]
 }
