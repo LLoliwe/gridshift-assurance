@@ -112,4 +112,21 @@ class AssuranceTests(unittest.TestCase):
   x=inv();x['period_start']='2026-03-31'; self.assertEqual(audit_portfolio(T,[x])['blocked'],1)
  def test_44_no_tax_allowed(self):
   x=t();del x['tax_rate'];y=inv();y['billed_lines']=[z for z in y['billed_lines'] if z['code']!='tax'];y['billed_total']=str(sum(Decimal(z['amount']) for z in y['billed_lines'])); self.assertEqual(audit_invoice(y,x)['outcome'],'MODEL_MATCH')
+ def test_45_automatic_tax_cannot_overwrite_explicit_tax_component(self):
+  tariff=t();tariff['components'][0]['code']='tax'
+  with self.assertRaisesRegex(ValueError,'tax component conflicts with automatic tax'):
+   validate_tariff(tariff)
+  with self.assertRaisesRegex(ValueError,'tax component conflicts with automatic tax'):
+   expected_lines(inv(),tariff)
+  with self.assertRaisesRegex(ValueError,'tax component conflicts with automatic tax'):
+   audit_portfolio([tariff],[inv()])
+ def test_46_explicit_tax_component_without_automatic_tax_is_preserved(self):
+  tariff=t();del tariff['tax_rate'];tariff['components'][0]['code']='tax'
+  result=expected_lines(inv(),tariff)
+  self.assertEqual(result['tax']['unit'],tariff['components'][0]['unit'])
+  self.assertEqual(result['tax']['expected'],'1460.00')  # 400 kWh * invented 3.65 rate
+ def test_47_zero_automatic_tax_still_cannot_overwrite_a_component(self):
+  tariff=t();tariff['tax_rate']='0';tariff['components'][0]['code']='tax'
+  with self.assertRaisesRegex(ValueError,'tax component conflicts with automatic tax'):
+   expected_lines(inv(),tariff)
 if __name__=='__main__':unittest.main(verbosity=2)

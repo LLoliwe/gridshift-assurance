@@ -90,8 +90,8 @@
       "bytes": 620
     },
     "src/assurance.py": {
-      "sha256": "8319614efc9e18047afd298033bc07f906b6024dc2aa46ff414ff3f3c8efc2bd",
-      "bytes": 10009
+      "sha256": "e36b3418ac523574d476d4e2545bab6535c1089414db1f476cbee13a550e9a44",
+      "bytes": 10098
     },
     "src/emissions.py": {
       "sha256": "c161c93e400929071d54621950a91da244a4376e286968e20838e15d80d638de",
@@ -102,8 +102,8 @@
       "bytes": 6677
     },
     "tests/test_assurance.py": {
-      "sha256": "bafe8759f68f9eb1e85c62a4e94068f4cae32dc4b81f87100b6962d20091f66d",
-      "bytes": 6578
+      "sha256": "246fb74b44eb42534cb5b6ab7235ec5c4d2f2dc082bee5725642d6a226a3e52e",
+      "bytes": 7683
     },
     "tests/test_emissions.py": {
       "sha256": "0b071b2980944b931348d7361b2aca6466268b6ace698ad9767877b9c845c9e3",

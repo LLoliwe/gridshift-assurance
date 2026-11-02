@@ -47,6 +47,7 @@ def validate_tariff(t):
         if unit not in SUPPORTED_UNITS: raise ValueError(f'unsupported component unit {unit}')
         dec(c.get('rate'), f'rate for {code}')
     if 'tax_rate' in t:
+        if 'tax' in seen: raise ValueError('tax component conflicts with automatic tax')
         if dec(t['tax_rate']) > 1: raise ValueError('tax_rate must be 0 through 1')
     return True
 
