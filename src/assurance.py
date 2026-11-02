@@ -5,12 +5,22 @@ Uses Python stdlib only. No internet, integrations, secrets, or device control.
 from __future__ import annotations
 import argparse, json, hashlib
 from datetime import date
-from decimal import Decimal, ROUND_HALF_UP, InvalidOperation
+from decimal import Decimal, ROUND_HALF_UP, InvalidOperation, Context, localcontext
+from functools import wraps
 from pathlib import Path
 from collections import defaultdict
 
 Q = Decimal('0.01')
+# Keep invoice arithmetic independent of the calling process's Decimal settings.
+_CALCULATION_CONTEXT = Context(prec=80, Emin=-999999, Emax=999999)
 SUPPORTED_UNITS = {'kwh_peak', 'kwh_standard', 'kwh_offpeak', 'kwh_total', 'peak_kw', 'demand_kva', 'service_days', 'bill_count'}
+
+def _deterministic_decimal(fn):
+    @wraps(fn)
+    def wrapped(*args, **kwargs):
+        with localcontext(_CALCULATION_CONTEXT):
+            return fn(*args, **kwargs)
+    return wrapped
 
 def dec(value, field='number'):
     if isinstance(value, bool): raise ValueError(f'{field}: bool not numeric')
@@ -19,6 +29,7 @@ def dec(value, field='number'):
     if not d.is_finite() or d < 0: raise ValueError(f'{field}: negative/nonfinite not allowed')
     return d
 
+@_deterministic_decimal
 def money(d):
     return str(d.quantize(Q, rounding=ROUND_HALF_UP))
 
@@ -36,7 +47,11 @@ def validate_tariff(t):
         if f not in t: raise ValueError('tariff missing '+f)
     if t['source_status'] not in ('SYNTHETIC', 'UNVERIFIED_TRANSCRIPTION'):
         raise ValueError('Only synthetic or explicitly unverified sources allowed in this pilot')
-    if len(t['country']) != 2 or len(t['currency']) != 3: raise ValueError('ISO country/currency needed')
+    country, currency = t['country'], t['currency']
+    if not isinstance(country, str) or len(country) != 2 or not country.isascii() or not country.isalpha() or not country.isupper():
+        raise ValueError('country must match ISO alpha-2 format (two uppercase ASCII letters)')
+    if not isinstance(currency, str) or len(currency) != 3 or not currency.isascii() or not currency.isalpha() or not currency.isupper():
+        raise ValueError('currency must match ISO alpha-3 format (three uppercase ASCII letters)')
     if not str(t['source_url']).startswith(('https://','http://')): raise ValueError('source URL required')
     if parse_date(t['effective_to']) <= parse_date(t['effective_from']): raise ValueError('invalid effective interval')
     seen = set()
@@ -50,12 +65,15 @@ def validate_tariff(t):
         if dec(t['tax_rate']) > 1: raise ValueError('tax_rate must be 0 through 1')
     return True
 
+@_deterministic_decimal
 def expected_lines(invoice,t):
     validate_tariff(t)
     for k in ('invoice_number','site_id','meter_id','country','currency','utility','tariff_id','period_start','period_end','quantities','billed_lines','billed_total'):
         if k not in invoice: raise ValueError(f'invoice missing {k}')
+    period_start = parse_date(invoice['period_start'])
+    period_end = parse_date(invoice['period_end'])
     days = days_between(invoice['period_start'], invoice['period_end'])
-    if invoice['period_start'] < t['effective_from'] or invoice['period_end'] > t['effective_to']:
+    if period_start < parse_date(t['effective_from']) or period_end > parse_date(t['effective_to']):
         raise ValueError('RATE_VERSION_SPLIT_REQUIRED: invoice outside tariff validity')
     for key in ('country','currency','utility','tariff_id'):
         if invoice[key] != t[key]: raise ValueError('tariff/invoice mismatch: '+key)
@@ -76,6 +94,7 @@ def expected_lines(invoice,t):
         result['tax']={'expected':money(taxable*dec(t['tax_rate'])),'unit':'tax','quantity':'1','rate':str(t['tax_rate'])}
     return result
 
+@_deterministic_decimal
 def audit_invoice(invoice, t, tolerance='0.02'):
     expected=expected_lines(invoice,t); threshold=dec(tolerance,'tolerance')
     billed={}; flags=[]; unknown=[]
@@ -131,7 +150,7 @@ def audit_portfolio(tariffs, invoices):
                 if a < pb and pa < b: issues.append('OVERLAPPING_BILLING_PERIOD:'+str(pid))
             grouped[key].append((a,b,inv.get('invoice_number')))
             candidates=[t for t in lookup.get((inv['country'],inv['utility'],inv['tariff_id']),[])
-                        if t['effective_from']<=inv['period_start'] and inv['period_end']<=t['effective_to']]
+                        if parse_date(t['effective_from'])<=a and b<=parse_date(t['effective_to'])]
             if len(candidates)!=1: raise ValueError('TARIFF_VERSION_NOT_UNIQUE_OR_MISSING')
             result=audit_invoice(inv,candidates[0])
             for issue in issues: result['flags'].append({'severity':'BLOCKED','code':issue})

@@ -1,4 +1,5 @@
 import unittest,json,copy,sys,tempfile
+from decimal import localcontext
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1] / 'src'))
 from assurance import *
@@ -112,4 +113,17 @@ class AssuranceTests(unittest.TestCase):
   x=inv();x['period_start']='2026-03-31'; self.assertEqual(audit_portfolio(T,[x])['blocked'],1)
  def test_44_no_tax_allowed(self):
   x=t();del x['tax_rate'];y=inv();y['billed_lines']=[z for z in y['billed_lines'] if z['code']!='tax'];y['billed_total']=str(sum(Decimal(z['amount']) for z in y['billed_lines'])); self.assertEqual(audit_invoice(y,x)['outcome'],'MODEL_MATCH')
+ def test_45_tariff_validity_uses_calendar_dates(self):
+  x=t();x['effective_from']='2026-W14-3'
+  self.assertEqual(audit_portfolio([x],[inv()])['blocked'],0)
+ def test_46_invoice_calculation_ignores_ambient_decimal_context(self):
+  expected=audit_invoice(inv(),t())
+  with localcontext() as context:
+   context.prec=2;context.Emax=2;context.Emin=-2
+   actual=audit_invoice(inv(),t())
+  self.assertEqual(actual,expected)
+ def test_47_country_and_currency_require_iso_alpha_format(self):
+  for field,value in [('country','1@'),('currency','1!X')]:
+   x=t();x[field]=value
+   with self.subTest(field=field,value=value),self.assertRaises(ValueError):validate_tariff(x)
 if __name__=='__main__':unittest.main(verbosity=2)
